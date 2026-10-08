@@ -1,1 +1,77 @@
+interrupt (인터럽트):
 
+마이크로프로세서나 컴퓨터 하드웨어/소프트웨어가 명령을 실행하고 있을 때, 입출력 장치나 예외 상황 발생 등 우선 처리가 필요한 이벤트가 발생하여 현재 수행 중인 작업을 잠시 중단하고 해당 상황을 처리한 뒤 원래 작업으로 돌아가는 메커니즘입니다.
+
+library (라이브러리):
+
+자주 사용하는 함수, 클래스, 데이터 구조 등의 코드들을 재사용할 수 있도록 모아놓은 집합체입니다. 코드 재사용성을 높이고 개발 시간을 단축하는 데 사용됩니다.
+
+
+DLL (동적 링크 라이브러리, Dynamic Link Library):
+
+마이크로소프트 윈도우(Windows) 운영체제에서 사용하는 개념으로, 프로그램이 실행될 때 메모리에 로드되어 동적으로 연결되는 라이브러리 파일(.dll)입니다. 여러 프로그램이 하나의 DLL 파일을 공유하여 메모리와 디스크 공간을 절약할 수 있습니다.
+
+
+DLL 만드는 방법
+
+C/C++ 등의 프로그래밍 언어와 개발 도구(예: Visual Studio)를 사용하여 DLL 프로젝트를 생성하고, 다른 프로그램에서 불러와 사용할 함수에 __declspec(dllexport) 등의 키워드를 붙여 빌드 및 작성하는 구체적인 실습 과정 또는 프로시저를 의미합니다.
+
+Visual Studio 프로젝트 생성
+
+1. Visual Studio를 실행하고 새 프로젝트 만들기를 선택합니다.
+2. 언어로 C++, 플랫폼으로 Windows를 선택한 후 동적 연결 라이브러리(DLL) 프로젝트 템플릿을 선택합니다.
+3. 프로젝트 이름(예: MyMathDLL)을 입력하고 생성을 클릭합니다.
+
+헤더 파일 작성 (내보낼 함수 선언)
+프로젝트에 MyMath.h 헤더 파일을 추가하고 아래와 같이 작성합니다.
+#pragma once
+
+#ifdef MYMATHDLL_EXPORTS
+#define MYMATH_API __declspec(dllexport)
+#else
+#define MYMATH_API __declspec(dllimport)
+#endif
+
+extern "C" {
+    MYMATH_API int Add(int a, int b);
+    MYMATH_API int Subtract(int a, int b);
+}
+
+__declspec(dllexport): 해당 함수를 DLL 외부로 내보냅니다.
+extern "C": C++의 이름 장식(Name Mangling)을 방지하여 C언어 스타일의 함수 이름으로 내보냅니다. (C#이나 Python 등 다른 언어 연동 시 필수)
+
+
+3.소스 파일 작성 (함수 구현):
+3-1 프로젝트에 MyMath.cpp 소스 파일을 추가하고 실제 동작 코드를 구현합니다.
+
+#include "pch.h" // Visual Studio 기본 미리 컴파일된 헤더
+#include "MyMath.h"
+
+int Add(int a, int b) {
+    return a + b;
+}
+
+int Subtract(int a, int b) {
+    return a - b;
+}
+
+4. DLL 빌드
+4-1 상단 메뉴에서 빌드 모드(Debug 또는 Release, x64 또는 x86)를 설정합니다.
+4-2 솔루션 빌드 (Ctrl + Shift + B)를 실행합니다.
+4-3 빌드가 완료되면 프로젝트 출력 폴더(예: x64/Release/)에 두 개의 주요 파일이 생성됩니다.
+MyMathDLL.dll: 실제 실행 로직이 들어있는 라이브러리 파일
+MyMathDLL.lib: 암시적 링크(Implicit Linking)를 위해 필요한 가져오기 라이브러리 파일
+
+5. 외부 프로젝트에서 DLL 연동하여 사용
+5-1 파일 복사:
+사용하려는 프로젝트 폴더에 MyMath.h 헤더 파일 복사
+빌드 실행 위치(exe 파일이 생성되는 폴더)에 MyMathDLL.dll 및 MyMathDLL.lib 복사
+#include <iostream>
+#include "MyMath.h"
+
+#pragma comment(lib, "MyMathDLL.lib") // .lib 파일 링크
+
+int main() {
+    std::cout << "3 + 5 = " << Add(3, 5) << std::endl;
+    return 0;
+}
