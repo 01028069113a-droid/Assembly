@@ -1,0 +1,106 @@
+8. 메시지 암호화 (Message Encryption)📌 번역섹션 6.3.4의 암호화 프로그램을 다음과 같은 방식으로 수정하세요: 
+여러 문자로 이루어진 암호화 키(encryption key)를 생성합니다. 이 키를 사용하여 평문의 각 문자와 메시지의 대응하는 바이트를 XOR 연산함으로써 평문을 암호화하고 복호화합니다.
+모든 평문 바이트가 변환될 때까지 필요에 따라 키를 반복합니다. 
+예를 들어, 키가 "ABXmv#7"이라고 가정해 보겠습니다. 키가 평문 바이트와 정렬되는 방식은 다음과 같습니다:   
+평문 (Plain text): T h i s   i s   a   P l a i n t e x t   m e s s a g e (기타 등등)   
+키 (Key):A B X m v # 7 A B X m v # 7 A B X m v # 7 A B X m v # 7 A` (키는 평문의 길이와 같아질 때까지 반복됩니다...)
+
+정답: 
+
+INCLUDE Irvine32.inc
+
+.data
+plaintext   BYTE "This is a Plaintext message", 0
+PLAINTEXT_LEN = ($ - plaintext) - 1
+key         BYTE "ABXmv#7", 0
+KEY_LEN     = ($ - key) - 1
+
+msgPrompt   BYTE "--- 암호화 및 복호화 데모 ---", 0ah, 0dh, 0
+msgOriginal BYTE "원본 텍스트: ", 0
+msgEncrypted BYTE "암호화된 텍스트(HEX): ", 0
+msgDecrypted BYTE "복호화된 텍스트: ", 0
+
+.code
+main PROC
+    mov edx, OFFSET msgPrompt
+    call WriteString
+
+    ; 1. 원본 출력
+    mov edx, OFFSET msgOriginal
+    call WriteString
+    mov edx, OFFSET plaintext
+    call WriteString
+    call Crlf
+
+    ; 2. 암호화 수행 (메시지 자체를 XOR 변환)
+    call EncryptDecrypt
+
+    ; 3. 암호화 결과(바이트 단위) 출력
+    mov edx, OFFSET msgEncrypted
+    call WriteString
+    mov ecx, PLAINTEXT_LEN
+    mov esi, OFFSET plaintext
+L_PrintHex:
+    movzx eax, BYTE PTR [esi]
+    call WriteHexB
+    mov al, ' '
+    call WriteChar
+    inc esi
+    loop L_PrintHex
+    call Crlf
+
+    ; 4. 복호화 수행 (다시 동일한 방식으로 XOR 수행)
+    call EncryptDecrypt
+
+    ; 5. 복호화된 원본 텍스트 출력
+    mov edx, OFFSET msgDecrypted
+    call WriteString
+    mov edx, OFFSET plaintext
+    call WriteString
+    call Crlf
+
+    exit
+main ENDP
+
+;------------------------------------------------------------
+; EncryptDecrypt
+; 평문과 키를 반복 XOR하여 암호화/복호화 수행
+;------------------------------------------------------------
+EncryptDecrypt PROC
+    push esi
+    push edi
+    push ecx
+    push ebx
+
+    mov esi, OFFSET plaintext   ; 평문 포인터
+    mov edi, OFFSET key         ; 키 포인터
+    mov ecx, PLAINTEXT_LEN      ; 반복 횟수 = 평문 길이
+    mov ebx, 0                  ; 키 인덱스 추적용 오프셋
+
+L_XorLoop:
+    ; 현재 키 바이트 가져오기
+    mov al, [edi + ebx]
+    
+    ; 평문 바이트와 XOR 연산
+    xor [esi], al
+
+    ; 다음 바이트로 이동
+    inc esi
+    inc ebx
+
+    ; 키 인덱스가 키 길이에 도달하면 0으로 리셋 (순환)
+    cmp ebx, KEY_LEN
+    jl L_SkipReset
+    mov ebx, 0
+L_SkipReset:
+
+    loop L_XorLoop
+
+    pop ebx
+    pop ecx
+    pop edi
+    pop esi
+    ret
+EncryptDecrypt ENDP
+
+END main
