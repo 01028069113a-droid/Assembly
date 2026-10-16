@@ -1,0 +1,63 @@
+문제:
+0에서 100 사이의 정수 값을 받아 AL 레지스터에 대문자 한 글자(학점)를 반환하는 CalcGrade라는 이름의 프로시저를 작성하세요. 프로시저 호출 간에 다른 모든 레지스터 값은 보존해야 합니다.
+
+정답:
+
+INCLUDE Irvine32.inc
+
+.code
+main PROC
+    ; 테스트 1: 점수 85 (B)
+    mov eax, 85
+    call CalcGrade
+    call WriteChar          ; 'B' 출력
+    call Crlf
+
+    ; 테스트 2: 점수 92 (A)
+    mov eax, 92
+    call CalcGrade
+    call WriteChar          ; 'A' 출력
+    call Crlf
+
+    exit
+main ENDP
+
+;------------------------------------------------------------
+; CalcGrade
+; 전달인자: EAX = 점수 (0 ~ 100)
+; 반환: AL = 학점 문자 ('A', 'B', 'C', 'D', 'F')
+;------------------------------------------------------------
+CalcGrade PROC
+    push ebx                ; 사용되는 레지스터 보존
+
+    mov bl, 'F'             ; 기본값 F
+
+    cmp eax, 90
+    jae GradeA
+    cmp eax, 80
+    jae GradeB
+    cmp eax, 70
+    jae GradeC
+    cmp eax, 60
+    jae GradeD
+    jmp SetResult
+
+GradeA:
+    mov bl, 'A'
+    jmp SetResult
+GradeB:
+    mov bl, 'B'
+    jmp SetResult
+GradeC:
+    mov bl, 'C'
+    jmp SetResult
+GradeD:
+    mov bl, 'D'
+
+SetResult:
+    mov al, bl              ; 결과를 AL에 채움
+    pop ebx                 ; 레지스터 복원
+    ret
+CalcGrade ENDP
+
+END main
