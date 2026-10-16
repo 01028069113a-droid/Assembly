@@ -1,0 +1,108 @@
+5. 부울 계산기 (1) - (Boolean Calculator (1))📌 번역32비트 정수를 위한 간단한 부울 계산기 기능을 하는 프로그램을 만드세요. 
+사용자에게 다음 목록에서 선택하도록 요청하는 메뉴를 표시해야 합니다: 
+ x AND y   
+x OR y  
+ NOT x   
+x XOR y   
+프로그램 종료 (Exit program)   사용자가 선택을 하면, 수행할 연산의 이름을 표시하는 프로시저를 호출하세요. 
+이 프로시저는 섹션 6.5.4에 나오는 테이블 기반 선택(Table-Driven Selection) 기법을 사용하여 구현해야 합니다.
+ (연산들은 연습문제 6번에서 구현하게 됩니다.) 
+(이 해답 프로그램에는 Irvine32 라이브러리가 필요합니다.)
+
+정답:
+
+INCLUDE Irvine32.inc
+
+.data
+menu        BYTE 0ah, 0dh, "--- 부울 계산기 메뉴 ---", 0ah, 0dh
+            BYTE "1. x AND y", 0ah, 0dh
+            BYTE "2. x OR y", 0ah, 0dh
+            BYTE "3. NOT x", 0ah, 0dh
+            BYTE "4. x XOR y", 0ah, 0dh
+            BYTE "5. Exit program", 0ah, 0dh
+            BYTE "선택하세요 (1-5): ", 0
+
+strAnd      BYTE "AND 연산을 수행합니다.", 0ah, 0dh, 0
+strOr       BYTE "OR 연산을 수행합니다.", 0ah, 0dh, 0
+strNot      BYTE "NOT 연산을 수행합니다.", 0ah, 0dh, 0
+strXor      BYTE "XOR 연산을 수행합니다.", 0ah, 0dh, 0
+strExit     BYTE "프로그램을 종료합니다.", 0ah, 0dh, 0
+
+; 테이블 기반 선택을 위한 구조 (값과 프로시저 주소 매핑)
+CaseTable   BYTE '1'
+            DWORD DisplayAnd
+    EntrySize EQU ($ - CaseTable)
+            BYTE '2'
+            DWORD DisplayOr
+            BYTE '3'
+            DWORD DisplayNot
+            BYTE '4'
+            DWORD DisplayXor
+            BYTE '5'
+            DWORD DisplayExit
+NumberOfEntries EQU ($ - CaseTable) / EntrySize
+
+.code
+main PROC
+Dojo:
+    mov edx, OFFSET menu
+    call WriteString
+    call ReadChar       ; AL에 문자 입력 받기
+    call WriteChar      ; 입력한 문자 화면에 표시
+    call Crlf
+
+    ; 종료 조건 확인 ('5')
+    cmp al, '5'
+    je ExitProgram
+
+    ; 테이블 검색 및 프로시저 호출
+    mov ebx, OFFSET CaseTable
+    mov ecx, NumberOfEntries
+
+L1:
+    cmp al, [ebx]       ; 입력값과 테이블의 선택지와 비교
+    jne L2
+    call NEAR PTR [ebx + 1] ; 일치하는 프로시저 호출
+    jmp Dojo
+
+L2:
+    add ebx, EntrySize
+    loop L1
+
+    jmp Dojo
+
+ExitProgram:
+    exit
+main ENDP
+
+DisplayAnd PROC
+    mov edx, OFFSET strAnd
+    call WriteString
+    ret
+DisplayAnd ENDP
+
+DisplayOr PROC
+    mov edx, OFFSET strOr
+    call WriteString
+    ret
+DisplayOr ENDP
+
+DisplayNot PROC
+    mov edx, OFFSET strNot
+    call WriteString
+    ret
+DisplayNot ENDP
+
+DisplayXor PROC
+    mov edx, OFFSET strXor
+    call WriteString
+    ret
+DisplayXor ENDP
+
+DisplayExit PROC
+    mov edx, OFFSET strExit
+    call WriteString
+    ret
+DisplayExit ENDP
+
+END main
