@@ -1,0 +1,59 @@
+7. 확률과 색상 (Probabilities and Colors)
+📌 번역
+화면에 텍스트를 표시할 때 세 가지 서로 다른 색상 중 하나를 무작위로 선택하는 프로그램을 작성하세요. 루프를 사용하여 각각 무작위로 선택된 색상의 텍스트 20줄을 출력하세요. 
+각 색상의 확률은 다음과 같습니다: 흰색(white) = 30%, 파란색(blue) = 10%, 초록색(green) = 60%.
+제안: 0에서 9 사이의 정수 난수를 생성하세요. 생성된 정수가 0부터 2 사이(양 끝 값 포함)이면 흰색을 선택하고, 정수가 3이면 파란색을 선택하며, 
+정수가 4부터 9 사이(양 끝 값 포함)이면 초록색을 선택하세요. 
+프로그램을 10번 실행하여 각 실행 시 라인 색상의 분포가 요구되는 확률과 일치하는지 관찰하며 테스트해보세요.
+(이 해답 프로그램에는 Irvine32 라이브러리가 필요합니다.)
+
+정답:
+
+INCLUDE Irvine32.inc
+
+.data
+textLine BYTE "이 텍스트는 무작위 색상으로 출력됩니다.", 0
+
+.code
+main PROC
+    call Randomize          ; 난수 생성기 초기화
+    mov ecx, 20             ; 20줄 출력 루프
+
+L_Display:
+    ; 0 ~ 9 사이의 난수 생성 (범위 크기 = 10)
+    mov eax, 10
+    call RandomRange        ; EAX = 0 ~ 9
+
+    ; 확률 분기 처리
+    cmp eax, 2              ; 0 ~ 2 (30% 확률)
+    jle ChooseWhite
+    cmp eax, 3              ; 3 (10% 확률)
+    je ChooseBlue
+    jmp ChooseGreen         ; 4 ~ 9 (60% 확률)
+
+ChooseWhite:
+    mov eax, white + (black * 16) ; 흰색 텍스트 (검은 배경)
+    jmp SetAndPrint
+
+ChooseBlue:
+    mov eax, blue + (black * 16)  ; 파란색 텍스트
+    jmp SetAndPrint
+
+ChooseGreen:
+    mov eax, green + (black * 16) ; 초록색 텍스트
+
+SetAndPrint:
+    call SetTextColor       ; 텍스트 색상 설정
+    mov edx, OFFSET textLine
+    call WriteString        ; 텍스트 출력
+    call Crlf               ; 줄 바꿈
+
+    loop L_Display
+
+    ; 원래 콘솔 색상(기본 흰색/회색)으로 복구
+    mov eax, lightgray + (black * 16)
+    call SetTextColor
+
+    exit
+main ENDP
+END main
