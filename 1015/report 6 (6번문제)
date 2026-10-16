@@ -1,0 +1,44 @@
+6. 부울 계산기 (2) - (Boolean Calculator (2))📌 번역다음 프로시저들을 구현하여 연습문제 5번의 해답 프로그램을 계속해서 확장하세요:  
+AND_op: 사용자에게 두 개의 16진수(hexadecimal) 정수를 입력받고, 이들에 대해 AND 연산을 수행한 뒤 그 결과를 16진수로 출력합니다. 
+
+정답:
+
+INCLUDE Irvine32.inc
+
+.data
+promptX     BYTE "첫 번째 16진수 정수(x)를 입력하세요: ", 0
+promptY     BYTE "두 번째 16진수 정수(y)를 입력하세요: ", 0
+resultMsg   BYTE "결과 (x AND y): ", 0
+
+.code
+; 연습문제 5번의 테이블 구조에 연결될 AND_op 프로시저 구현 예시
+AND_op PROC
+    push edx
+    push eax
+
+    ; 첫 번째 수 입력
+    mov edx, OFFSET promptX
+    call WriteString
+    call ReadHex        ; EAX에 16진수 입력 받기
+    mov ebx, eax        ; EBX에 x 저장
+
+    ; 두 번째 수 입력
+    mov edx, OFFSET promptY
+    call WriteString
+    call ReadHex        ; EAX에 16진수 입력 받기
+
+    ; AND 연산 수행
+    and eax, ebx        ; EAX = x AND y
+
+    ; 결과 출력
+    mov edx, OFFSET resultMsg
+    call WriteString
+    call WriteHex       ; 16진수로 결과 출력
+    call Crlf
+
+    pop eax
+    pop edx
+    ret
+AND_op ENDP
+
+END
