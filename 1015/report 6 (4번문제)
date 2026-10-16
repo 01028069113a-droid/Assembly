@@ -1,0 +1,66 @@
+4. 대학 등록 (College Registration)📌 번역섹션 6.7.3의 대학 등록(College Registration) 예제를 시작점으로 사용하여 다음을 수행하세요:   .IF 및 .ELSEIF 지시어 대신 CMP와 조건부 점프(conditional jump) 명령어를 사용하여 로직을 다시 작성하세요.   학점(credits) 값의 범위를 검사하세요. 학점은 1 미만이거나 30 초과일 수 없습니다. 잘못된 입력이 발견되면 적절한 오류 메시지를 출력하세요.   사용자에게 평점(grade average)과 학점(credits) 값을 입력받으세요.   "학생이 등록할 수 있습니다(The student can register)" 또는 "학생이 등록할 수 없습니다(The student cannot register)"와 같이 평가 결과를 보여주는 메시지를 출력하세요.
+(이 해답 프로그램에는 Irvine32 라이브러리가 필요합니다.)
+
+정답:
+
+INCLUDE Irvine32.inc
+
+.data
+prompt1     BYTE "평점(Grade Average, 예: 3.5)을 입력하세요: ", 0
+prompt2     BYTE "학점수(Credits, 1~30)를 입력하세요: ", 0
+msgError    BYTE "오류: 학점은 1에서 30 사이여야 합니다.", 0
+msgCanReg   BYTE "학생이 등록할 수 있습니다.", 0
+msgNoReg    BYTE "학생이 등록할 수 없습니다.", 0
+
+minCredits  DWORD 1
+maxCredits  DWORD 30
+minGPA      DWORD 250   ; 예시 기준 (예: 2.5를 100을 곱해 정수로 처리 또는 실수 비교)
+
+.code
+main PROC
+    ; 1. 평점 입력 받기
+    mov edx, OFFSET prompt1
+    call WriteString
+    call ReadInt
+    mov ebx, eax        ; EBX에 평점 저장
+
+    ; 2. 학점 입력 받기
+    mov edx, OFFSET prompt2
+    call WriteString
+    call ReadInt
+    mov ecx, eax        ; ECX에 학점 저장
+
+    ; 3. 학점 범위 검사 (1 ~ 30)
+    cmp ecx, minCredits
+    jl ErrorRange
+    cmp ecx, maxCredits
+    jg ErrorRange
+
+    ; 4. 등록 조건 검사 (예: 평점이 기준 이상이고 학점이 충족되는지)
+    ; 여기서는 단순화하여 평점이 2.5(250) 이상이고 학점이 12학점 이상인 경우로 가정
+    cmp ebx, 250
+    jl CannotRegister
+    cmp ecx, 12
+    jl CannotRegister
+
+    ; 등록 가능 메시지 출력
+    mov edx, OFFSET msgCanReg
+    call WriteString
+    call Crlf
+    jmp ExitProgram
+
+ErrorRange:
+    mov edx, OFFSET msgError
+    call WriteString
+    call Crlf
+    jmp ExitProgram
+
+CannotRegister:
+    mov edx, OFFSET msgNoReg
+    call WriteString
+    call Crlf
+
+ExitProgram:
+    exit
+main ENDP
+END main
