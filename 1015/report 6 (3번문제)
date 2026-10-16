@@ -1,5 +1,9 @@
-문제:
-0에서 100 사이의 정수 값을 받아 AL 레지스터에 대문자 한 글자(학점)를 반환하는 CalcGrade라는 이름의 프로시저를 작성하세요. 프로시저 호출 간에 다른 모든 레지스터 값은 보존해야 합니다.
+3. 시험 점수 평가 (Test Score Evaluation)   
+0에서 100 사이의 정수 값을 받아 AL 레지스터에 대문자 한 글자(학점)를 반환하는 CalcGrade라는 이름의 프로시저를 작성하세요. 
+프로시저 호출 간에 다른 모든 레지스터 값은 보존해야 합니다. 프로시저가 반환하는 문자는 다음 범위에 따라야 합니다.
+50부터 100 사이(양 끝 값 포함)의 난수 정수 10개를 생성하는 테스트 프로그램을 작성하세요. 정수가 생성될 때마다 이를 CalcGrade 프로시저에 전달하세요. 
+디버거를 사용하여 프로그램을 테스트하거나, 책의 라이브러리를 선호하는 경우 각 정수와 그에 해당하는 학점을 화면에 출력할 수 있습니다. 
+(RandomRange 프로시저를 사용하므로 이 해답 프로그램에는 Irvine32 라이브러리가 필요합니다
 
 정답:
 
@@ -7,17 +11,31 @@ INCLUDE Irvine32.inc
 
 .code
 main PROC
-    ; 테스트 1: 점수 85 (B)
-    mov eax, 85
-    call CalcGrade
-    call WriteChar          ; 'B' 출력
-    call Crlf
+    call Randomize          ; 난수 생성기 초기화
+    mov ecx, 10             ; 10번 반복
 
-    ; 테스트 2: 점수 92 (A)
-    mov eax, 92
+L_Loop:
+    ; 50에서 100 사이의 난수 생성 공식: 
+    ; 범위 크기 = (100 - 50 + 1) = 51
+    ; RandomRange 호출 -> [0, 50] 범위의 값 반환
+    ; 여기에 최솟값 50을 더하면 [50, 100] 범위가 됨
+    mov eax, 51
+    call RandomRange
+    add eax, 50             ; EAX = 50 ~ 100 사이의 난수
+
+    ; 생성된 점수 출력 (선택 사항)
+    push eax
+    call WriteDec           ; 점수 출력
+    mov edx, OFFSET strArrow
+    call WriteString        ; " -> " 출력
+
+    ; CalcGrade 프로시저 호출
     call CalcGrade
-    call WriteChar          ; 'A' 출력
-    call Crlf
+    call WriteChar          ; 학점 문자(AL) 출력
+    call Crlf               ; 줄 바꿈
+
+    pop eax
+    loop L_Loop
 
     exit
 main ENDP
@@ -26,11 +44,12 @@ main ENDP
 ; CalcGrade
 ; 전달인자: EAX = 점수 (0 ~ 100)
 ; 반환: AL = 학점 문자 ('A', 'B', 'C', 'D', 'F')
+; 설명: 다른 레지스터 값들을 안전하게 보존합니다.
 ;------------------------------------------------------------
 CalcGrade PROC
-    push ebx                ; 사용되는 레지스터 보존
+    push ebx                ; 사용되는 EBX 레지스터 보존
 
-    mov bl, 'F'             ; 기본값 F
+    mov bl, 'F'             ; 기본값 F 설정
 
     cmp eax, 90
     jae GradeA
@@ -55,9 +74,12 @@ GradeD:
     mov bl, 'D'
 
 SetResult:
-    mov al, bl              ; 결과를 AL에 채움
+    mov al, bl              ; 결과 문자를 AL에 대입
     pop ebx                 ; 레지스터 복원
     ret
 CalcGrade ENDP
+
+.data
+strArrow BYTE " -> 학점: ", 0
 
 END main
