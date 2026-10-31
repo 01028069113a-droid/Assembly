@@ -1,0 +1,22 @@
+INCLUDE Irvine32.inc
+
+.code
+; Extended_Sub(esi: num1 주소, edi: num2 주소, ebx: result 주소, ecx: 32비트 단위 개수)
+Extended_Sub PROC
+    pushad
+    clc                   ; 캐리 플래그 초기화
+
+L1:
+    mov eax, [esi]
+    sbb eax, [edi]        ; 빌림수를 포함한 뺄셈 (EAX = EAX - [EDI] - CF)
+    mov [ebx], eax
+
+    add esi, 4            ; 다음 32비트(4바이트)로 이동
+    add edi, 4
+    add ebx, 4
+    loop L1
+
+    popad
+    ret
+Extended_Sub ENDP
+```
