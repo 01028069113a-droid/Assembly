@@ -1,0 +1,56 @@
+5번 문제: Prime Numbers (소수 구하기)
+
+에라토스테네스의 체(Sieve of Eratosthenes) 방법을 사용하여 2와 1000 사이의 모든 소수를 생성하는 프로그램을 작성하시오[cite: 4]. 인터넷에서 이 방법을 설명하는 다양한 글을 찾을 수 있습니다.모든 소수 값을 화면에 출력하시오
+
+정답:
+
+INCLUDE Irvine32.inc
+
+FIRST_PRIME = 2
+LAST_PRIME = 1000
+
+.data
+sieve BYTE LAST_PRIME DUP(1) ; 1로 초기화 (1: 소수 후보, 0: 합성수)
+
+.code
+main PROC
+    ; 2부터 시작하여 합성수 지우기 (체 적용)
+    mov esi, FIRST_PRIME
+L_outer:
+    cmp byte ptr sieve[esi], 1
+    jne NextOuter
+
+    ; esi의 배수들을 0으로 설정
+    mov edi, esi
+    add edi, esi          ; 2 * esi 부터 시작
+L_inner:
+    cmp edi, LAST_PRIME
+    jge NextOuter
+    mov byte ptr sieve[edi], 0
+    add edi, esi          ; 다음 배수
+    jmp L_inner
+
+NextOuter:
+    inc esi
+    cmp esi, LAST_PRIME
+    jl L_outer
+
+    ; 결과 출력
+    mov ecx, FIRST_PRIME
+PrintLoop:
+    cmp byte ptr sieve[ecx], 1
+    jne SkipPrint
+    mov eax, ecx
+    call WriteDec
+    mov al, ' '
+    call WriteChar
+SkipPrint:
+    inc ecx
+    cmp ecx, LAST_PRIME
+    jbe PrintLoop
+
+    call Crlf
+    exit
+main ENDP
+END main
+```[cite: 4]
