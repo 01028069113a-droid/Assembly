@@ -1,0 +1,28 @@
+3번 문제: Packed Decimal Conversion (팩 십진수 변환)
+
+4바이트 팩 십진수(Packed Decimal) 정수를 ASCII 십진수 숫자 문자열로 변환하는 PackedToAsc 프로시저를 작성하시오. 팩 정수와 ASCII 숫자를 저장할 버퍼의 주소를 프로시저에 전달하시오. 최소 5개의 팩 십진 정수를 프로시저에 전달하여 테스트하는 짧은 프로그램을 작성하시오.
+
+정답:
+INCLUDE Irvine32.inc
+
+.code
+; PackedToAsc(eax: 4바이트 팩 십진수, edx: 버퍼 주소)
+PackedToAsc PROC
+    pushad
+    mov ecx, 8            ; 총 8개의 16진수/10진수 니블
+    mov esi, edx
+    add esi, 7            ; 버퍼의 뒤에서부터 저장
+
+L1:
+    mov ebx, eax
+    and ebx, 0Fh          ; 하위 4비트(니블) 마스크
+    or bl, 30h            ; ASCII 문자로 변환 ('0'~'9')
+    mov [esi], bl
+    dec esi
+    shr eax, 4            ; 다음 니블로 이동
+    loop L1
+
+    popad
+    ret
+PackedToAsc ENDP
+```
