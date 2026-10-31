@@ -1,0 +1,50 @@
+8번 문제: Add Packed Integers (확장 팩 십진수 더하기)
+
+7.6.1절의 AddPacked 프로시저를 확장하여 임의 크기(두 길이가 동일해야 함)의 두 팩 십진수 정수를 더할 수 있도록 하시오. AddPacked에 4바이트, 8바이트, 16바이트 정수 쌍을 전달하여 테스트하는 프로그램을 작성하시오. 프로시저에 정보를 전달할 때 다음 레지스터를 사용하는 것을 권장합니다
+
+정답:
+INCLUDE Irvine32.inc
+
+.code
+;---------------------------------------------------
+; AddPacked
+; 입력: ESI = 첫 번째 수 주소, EDI = 두 번째 수 주소, 
+;       EDX = 결과 주소, ECX = 바이트 수
+;---------------------------------------------------
+AddPacked PROC
+    pushad
+    clc                   ; 캐리 플래그(CF) 초기화
+
+L1:
+    mov al, [esi]
+    adc al, [edi]         ; 빌림/올림수를 고려한 바이트 덧셈
+    daa                   ; Decimal Adjust after Addition (BCD 덧셈 보정)
+    mov [edx], al         ; 결과 저장
+
+    inc esi               ; 다음 바이트로 이동 (하위 바이트 -> 상위 바이트)
+    inc edi
+    inc edx
+    loop L1
+
+    popad
+    ret
+AddPacked ENDP
+
+main PROC
+    .data
+    ; 리틀 엔디언 구조이므로 하위 바이트부터 배치
+    val1 BYTE 45h, 23h, 01h, 00h     ; 00012345h
+    val2 BYTE 55h, 76h, 00h, 00h     ; 00007655h
+    sum  BYTE 4 DUP(0)               ; 결과: 00019999h (45+55=00 carry 1, 23+76+1=00...)
+
+    .code
+    mov esi, OFFSET val1
+    mov edi, OFFSET val2
+    mov edx, OFFSET sum
+    mov ecx, 4                       ; 4바이트 덧셈
+    call AddPacked
+
+    exit
+main ENDP
+END main
+```[cite: 5]
