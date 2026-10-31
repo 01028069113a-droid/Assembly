@@ -1,0 +1,10 @@
+10번 문제
+문제 번역: 다음 명령어들이 64비트 모드에서 실행된 후 RAX 레지스터의 16진수 내용은 무엇이 되는가?
+
+.data
+multiplicand QWORD 0001020304050000h
+.code
+imul rax, multiplicand, 4
+imul reg64, memory64, immediate 부호 있는 곱셈 명령어 형태입니다 (RAX = multiplicand * 4).
+
+정답: RAX = 0004080C10140000h
