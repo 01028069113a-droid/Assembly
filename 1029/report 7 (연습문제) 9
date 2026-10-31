@@ -1,0 +1,36 @@
+9번 문제   문제 번역: 다음 프로그램은 val1에서 val2를 빼도록 작성되었습니다. 모든 논리적 오류를 찾아 수정하시오 (CLC는 캐리 플래그를 0으로 초기화함).
+
+.data
+val1   QWORD 20403004362047A1h
+val2   QWORD 055210304A2630B2h
+result QWORD 0
+
+.code
+mov cx, 8             ; loop counter
+mov esi, val1         ; set index to start
+mov edi, val2
+clc                   ; clear Carry flag
+top:
+mov al, BYTE PTR[esi] ; get first number
+sbb al, BYTE PTR[edi] ; subtract second
+mov BYTE PTR[esi], al ; store the result
+dec esi
+dec edi
+loop top
+
+수정코드
+
+mov cx, 8
+mov esi, OFFSET val1   ; OFFSET 키워드 추가
+mov edi, OFFSET val2   ; OFFSET 키워드 추가
+mov ebx, OFFSET result ; 결과 저장을 위한 주소 추가
+clc
+top:
+mov al, BYTE PTR[esi]
+sbb al, BYTE PTR[edi]
+mov BYTE PTR[ebx], al  ; val1 대신 result에 저장
+inc esi                ; 하위 바이트에서 상위 바이트로 이동하기 위해 inc 사용
+inc edi
+inc ebx
+loop top
+```
