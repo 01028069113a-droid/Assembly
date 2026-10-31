@@ -1,0 +1,20 @@
+8번 문제
+문제 번역: 다음 코드가 64비트 모드에서 실행될 때의 출력을 설명하시오 (RAX, RDX 레지스터의 결과 값).
+
+.data
+dividend_hi QWORD 00000108h
+dividend_lo QWORD 33300020h
+divisor     QWORD 00000100h
+.code
+mov rdx, dividend_hi
+mov rax, dividend_lo
+div divisor
+
+64비트 모드에서 64비트 피연산자(divisor)로 div를 수행하면 RDX:RAX (128비트 값)를 divisor로 나눕니다.
+피나눗수 (RDX:RAX): 0000000000000108 3330002000000000h (또는 00000108 33300020h)
+제수 (divisor): 0000000000000100h
+
+몫: 0000000108333000h (RAX에 저장)
+나머지: 0000000000000020h (RDX에 저장)
+
+정답: RAX = 0000000108333000h (몫), RDX = 0000000000000020h (나머지)
