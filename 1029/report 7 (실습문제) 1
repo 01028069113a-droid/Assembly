@@ -1,0 +1,47 @@
+1번 문제 실습문제
+문제 번역:
+암시적 소수점을 가진 ASCII 십진수를 출력하는 WriteScaled라는 이름의 프로시저를 작성하시오. 예를 들어 아래와 같이 정의되어 있고, DECIMAL_OFFSET이 오른쪽에서부터 5번째 위치에 소수점을 삽입해야 함을 나타낸다고 가정합니다
+
+
+DECIMAL_OFFSET = 5
+.data
+decimal_one BYTE "100123456789765"
+1001234567.89765
+
+정답:
+INCLUDE Irvine32.inc
+
+.data
+DECIMAL_OFFSET = 5
+decimal_one BYTE "100123456789765"
+len_one = ($ - decimal_one)
+
+.code
+WriteScaled PROC
+    ; 입력: EDX = 문자열 주소, ECX = 전체 길이, EBX = 소수점 위치 (오른쪽 기준)
+    pushad
+
+    mov esi, edx          ; 문자열 시작 주소
+    mov edi, ecx          ; 전체 길이
+    sub edi, ebx          ; 소수점이 찍힐 인덱스 (왼쪽 기준) = ECX - EBX
+
+    mov ecx, 0            ; 인덱스 카운터
+L1:
+    cmp ecx, edi
+    jne PrintChar
+    mov al, '.'           ; 소수점 위치에 다다르면 '.' 출력
+    call WriteChar
+
+PrintChar:
+    mov al, [esi + ecx]
+    call WriteChar
+    inc ecx
+    cmp ecx, [esp + 24]   ; original ECX (전체 길이)
+    jbe L1                ; 마지막 문자까지 반복
+
+    call Crlf
+    popad
+    ret
+WriteScaled ENDP
+```
+
