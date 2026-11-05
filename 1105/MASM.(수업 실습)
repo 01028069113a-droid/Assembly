@@ -1,0 +1,51 @@
+VS코드로 작성
+
+; MASM x86 Assembly Program for VS Code / Irvine32
+INCLUDE Irvine32.inc
+
+.data
+    msgName   BYTE "이름: 김능인", 0
+    msgId     BYTE "학번: 2023864005", 0
+
+.code
+main PROC
+    mov edx, OFFSET msgName
+    call WriteString
+    call Crlf
+
+    mov edx, OFFSET msgId
+    call WriteString
+    call Crlf
+
+    exit
+main ENDP
+END main
+
+----------------------------------------------------------------------------------------------------------------
+
+MASM으로 만들기
+
+; MASM x86 Assembly Program (Irvine32)
+
+
+INCLUDE Irvine32.inc
+.data;
+
+    msgName   BYTE "이름: 김능인", 0      ;
+    msgId     BYTE "학번: 2023864005", 0    ;
+
+.code
+main PROC
+   
+    mov edx, OFFSET msgName
+    call WriteString
+    call Crlf          
+    
+    mov edx, OFFSET msgId
+    call WriteString
+    call Crlf;
+
+    
+    exit
+main ENDP
+END main
