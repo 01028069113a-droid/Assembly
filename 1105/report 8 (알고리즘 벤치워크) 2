@@ -1,0 +1,11 @@
+2번
+세 개의 정수 매개변수를 받아 이들의 합을 계산하고, 그 결과를 EAX 레지스터에 담아 반환하는 AddThree 프로시저를 작성하세요.
+
+정답:
+AddThree PROC,
+    val1:DWORD, val2:DWORD, val3:DWORD
+
+    mov eax, val1       ; 첫 번째 매개변수를 EAX에 복사
+    add eax, val2       ; 두 번째 매개변수 더하기
+    add eax, val3       ; 세 번째 매개변수 더하기
+    ret                 ; 합계가 담긴 EAX를 유지한 채 반환
