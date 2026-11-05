@@ -1,0 +1,5 @@
+7. 배열 지역 변수 선언
+문제: 20개의 더블워드(doubleword)로 이루어진 배열인 myArray라는 이름의 지역 변수를 선언하세요
+
+정답:
+LOCAL myArray[20]:DWORD
