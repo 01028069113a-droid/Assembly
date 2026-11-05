@@ -9,3 +9,4 @@ AddThree PROC,
     add eax, val2       ; 두 번째 매개변수 더하기
     add eax, val3       ; 세 번째 매개변수 더하기
     ret                 ; 합계가 담긴 EAX를 유지한 채 반환
+AddThree ENDP
