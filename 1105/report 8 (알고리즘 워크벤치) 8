@@ -1,0 +1,16 @@
+8. SetColor 프로시저 생성
+문제:
+forecolor와 backcolor라는 두 개의 스택 매개변수를 받고, 
+Irvine32 라이브러리의 SetTextColor 프로시저를 호출하는 SetColor 프로시저를 작성하세요.
+
+정답:
+SetColor PROC,
+    forecolor:BYTE, backcolor:BYTE
+
+    movzx eax, backcolor
+    shl eax, 4            ; 배경색은 상위 4비트로 이동
+    movzx ebx, forecolor
+    or eax, ebx           ; 전경색과 결합
+    call SetTextColor     ; Irvine32 라이브러리 함수 호출
+    ret
+SetColor ENDP
