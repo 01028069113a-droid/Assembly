@@ -1,0 +1,69 @@
+7. Greatest Common Divisor (최대공약수)
+
+7. 최대공약수(GCD)
+두 정수의 최대공약수(GCD)를 구하기 위한 유클리드 알고리즘의 순환(재귀) 구현을 작성하세요. 
+이 알고리즘에 대한 설명은 대수학 책이나 웹에서 찾아볼 수 있습니다. 
+다음 다섯 쌍의 정수를 사용하여 GCD 프로시저를 다섯 번 호출하는 테스트 프로그램을 작성하세요: 
+(5,20), (24,18), (11,7), (432,226), (26,13). 각 프로시저 호출 후에 GCD를 출력하세요.
+
+정답:
+
+INCLUDE Irvine32.inc
+
+CalcGCD PROTO,
+    x:DWORD, y:DWORD
+
+.code
+main PROC
+    ; (5, 20)
+    INVOKE CalcGCD, 5, 20
+    call WriteDec
+    call Crlf
+
+    ; (24, 18)
+    INVOKE CalcGCD, 24, 18
+    call WriteDec
+    call Crlf
+
+    ; (11, 7)
+    INVOKE CalcGCD, 11, 7
+    call WriteDec
+    call Crlf
+
+    ; (432, 226)
+    INVOKE CalcGCD, 432, 226
+    call WriteDec
+    call Crlf
+
+    ; (26, 13)
+    INVOKE CalcGCD, 26, 13
+    call WriteDec
+    call Crlf
+
+    exit
+main ENDP
+
+; 유클리드 호제법을 이용한 재귀 GCD 프로시저
+CalcGCD PROC,
+    x:DWORD, y:DWORD
+
+    mov eax, y
+    cmp eax, 0
+    jne L_recurse
+    
+    mov eax, x          ; y가 0이면 x가 최대공약수
+    jmp L_end
+
+L_recurse:
+    ; GCD(y, x % y)
+    mov edx, 0
+    mov eax, x
+    div y               ; EDX에 나머지(x % y)가 저장됨
+    
+    INVOKE CalcGCD, y, edx
+
+L_end:
+    ret
+CalcGCD ENDP
+
+END main
