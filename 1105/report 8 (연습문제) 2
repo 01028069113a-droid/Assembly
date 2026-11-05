@@ -1,0 +1,71 @@
+2. Chess Board (체스판 그리기)
+
+2. 체스판
+회색과 흰색 칸이 번갈아 나타나는 8*8체스판을 화면에 그리는 프로그램을 작성하세요. 
+Irvine32 라이브러리의 SetTextColor와 Gotoxy 프로시저를 사용할 수 있습니다. 전역 변수의 사용을 피하고, 
+모든 프로시저에서 선언된 매개변수를 사용하세요. 단일 작업에 집중하는 짧은 프로시저들을 작성하세요.   
+
+
+정답:
+
+INCLUDE Irvine32.inc
+
+DrawSquare PROTO, row:BYTE, col:BYTE, color:BYTE
+
+.code
+main PROC
+    LOCAL r:BYTE, c:BYTE
+
+    mov r, 0
+L_row:
+    mov c, 0
+L_col:
+    ; 행 번호와 열 번호의 합이 짝수면 회색(예: 70h), 홀수면 흰색(예: F0h)
+    movzx eax, r
+    movzx ebx, c
+    add eax, ebx
+    test eax, 1
+    jnz L_white
+
+    ; 회색 칸 그리기
+    INVOKE DrawSquare, r, c, 70h
+    jmp L_next
+
+L_white:
+    ; 흰색 칸 그리기
+    INVOKE DrawSquare, r, c, F0h
+
+L_next:
+    inc c
+    cmp c, 8
+    jl L_col
+
+    inc r
+    cmp r, 8
+    jl L_row
+
+    call Crlf
+    exit
+main ENDP
+
+; 단일 칸을 출력하는 프로시저
+DrawSquare PROC USES eax edx,
+    row:BYTE, col:BYTE, color:BYTE
+
+    movzx eax, color
+    call SetTextColor
+
+    movzx edx, col
+    shl edx, 1             ; 열 간격을 맞추기 위해 2칸씩 띄움
+    movzx eax, row
+    call Gotoxy
+
+    mov edx, OFFSET spaceStr
+    call WriteString
+    ret
+DrawSquare ENDP
+
+.data
+    spaceStr BYTE "  ", 0
+
+END main
