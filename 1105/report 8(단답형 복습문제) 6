@@ -1,0 +1,5 @@
+6번
+문제: C 호출 규약(C Calling Convention, cdecl)은 STDCALL 호출 규약에 비해 어떤 장점을 가질 수 있는가?
+
+정답: 호출자(Caller)가 스택을 정리하기 때문에, 
+printf와 같이 매개변수의 개수가 정해지지 않은 가변 인자 함수(Variable-length parameter functions)를 지원할 수 있습니다.
