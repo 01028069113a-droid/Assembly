@@ -1,0 +1,67 @@
+10. Show Procedure Parameters (프로시저 매개변수 출력하기)
+
+10. 프로시저 매개변수 출력하기
+자신을 호출한 프로시저의 런타임 스택에 있는 32비트 매개변수들의 주소와 1헥사데시멀(16진수) 값을 출력하는 ShowParams 프로시저를 작성하세요. 
+매개변수는 가장 낮은 주소부터 가장 높은 주소 순서대로 출력되어야 합니다. 이 프로시저의 입력은 출력할 매개변수의 개수를 나타내는 단일 정수입니다. 
+예를 들어, 메인 함수에서 다음과 같은 문장이 세 개의 인자를 전달하여 MySample을 호출한다고 가정해 봅시다.
+
+정답:
+
+INCLUDE Irvine32.inc
+
+ShowParams PROTO,
+    numParams:DWORD
+
+MySample PROTO,
+    arg1:DWORD, arg2:DWORD, arg3:DWORD
+
+.code
+main PROC
+    ; 예시 호출
+    INVOKE MySample, 1234h, 5000h, 6543h
+    exit
+main ENDP
+
+; MySample 프로시저
+MySample PROC,
+    arg1:DWORD, arg2:DWORD, arg3:DWORD
+
+    ; 매개변수 3개를 출력하도록 ShowParams 호출
+    INVOKE ShowParams, 3
+    ret
+MySample ENDP
+
+; ShowParams 프로시저 구현
+ShowParams PROC USES eax ebx ecx edx esi,
+    numParams:DWORD
+
+    ; EBP는 이 프로시저의 프레임 포인터입니다.
+    ; 호출한 함수(MySample)의 스택 프레임은 [EBP + 8]이 첫 번째 매개변수(arg1)입니다.
+    ; (주의: EBP 바로 위 [+4]는 리턴 주소입니다.)
+    
+    mov esi, ebp
+    add esi, 8             ; 가장 낮은 주소의 매개변수(첫 번째 인자) 위치로 설정
+    mov ecx, numParams     ; 출력할 개수
+
+L_loop:
+    ; 주소 출력
+    mov eax, esi
+    call WriteHex
+    mov edx, OFFSET strColon
+    call WriteString
+
+    ; 값 출력
+    mov eax, [esi]
+    call WriteHex
+    call Crlf
+
+    add esi, 4             ; 다음 높은 주소(다음 매개변수)로 이동
+    loop L_loop
+
+    ret
+ShowParams ENDP
+
+.data
+    strColon BYTE ": ", 0
+
+END main
