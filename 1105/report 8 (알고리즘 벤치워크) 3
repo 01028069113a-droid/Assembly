@@ -1,0 +1,5 @@
+3번
+더블워드(doubleword) 배열을 가리키는 포인터인 pArray라는 이름의 지역 변수를 선언하세요.
+
+정답:
+LOCAL pArray:PTR DWORD
