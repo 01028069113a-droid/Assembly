@@ -1,0 +1,7 @@
+5번
+5. 지역 변수 선언 (16비트 unsigned)
+
+문제 번역: 16비트 부호 없는 정수를 가리키는 pwArray라는 이름의 지역 변수를 선언하세요.
+
+정답:
+LOCAL pwArray:PTR WORD
