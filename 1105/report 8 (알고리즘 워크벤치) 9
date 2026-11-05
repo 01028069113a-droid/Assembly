@@ -1,0 +1,20 @@
+9. WriteColorChar 프로시저 생성
+문제: char, forecolor, backcolor라는 세 개의 스택 매개변수를 받는 WriteColorChar 프로시저를 작성하세요. 
+이 프로시저는 forecolor와 backcolor에 지정된 색상 속성을 사용하여 단일 문자를 화면에 출력합니다.
+
+정답:
+WriteColorChar PROC,
+    char:BYTE, forecolor:BYTE, backcolor:BYTE
+
+    ; 색상 설정
+    movzx eax, backcolor
+    shl eax, 4
+    movzx ebx, forecolor
+    or eax, ebx
+    call SetTextColor
+
+    ; 문자 출력
+    mov al, char
+    call WriteChar
+    ret
+WriteColorChar ENDP
