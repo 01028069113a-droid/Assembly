@@ -1,0 +1,27 @@
+11. MultArray 프로시저 및 PROTO 선언
+
+문제:더블워드 배열을 가리키는 두 개의 포인터와 배열 원소의 개수를 나타내는 세 번째 매개변수를 받는 MultArray 프로시저를 선언하세요. 
+또한 이 프로시저에 대한 PROTO 선언을 만드세요
+
+정답:
+
+; PROTO 선언
+MultArray PROTO,
+    pArr1:PTR DWORD,
+    pArr2:PTR DWORD,
+    arrSize:DWORD
+
+; 프로시저 정의
+MultArray PROC USES esi edi ecx,
+    pArr1:PTR DWORD,
+    pArr2:PTR DWORD,
+    arrSize:DWORD
+
+    mov esi, pArr1
+    mov edi, pArr2
+    mov ecx, arrSize
+
+    ; (필요한 배열 연산 로직 구현)
+
+    ret
+MultArray ENDP
