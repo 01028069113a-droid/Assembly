@@ -1,0 +1,16 @@
+10. DumpMemory 프로시저 작성
+문제: Irvine32 라이브러리의 DumpMem 프로시저를 캡슐화하는 DumpMemory 프로시저를 작성하세요. 선언된 매개변수와 USES 지시어를 사용하세요. 
+다음은 호출 예시입니다:
+
+정답:
+DumpMemory PROC USES esi ebx ecx edx,
+    pMem:PTR DWORD,
+    szCount:DWORD,
+    typeSize:DWORD
+
+    mov esi, pMem         ; 메모리 주소
+    mov ecx, szCount      ; 원소 개수
+    mov ebx, typeSize     ; 원소 크기 (TYPE)
+    call DumpMem          ; Irvine32 DumpMem 호출
+    ret
+DumpMemory ENDP
