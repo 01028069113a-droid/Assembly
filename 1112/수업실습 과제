@@ -1,0 +1,44 @@
+INCLUDE Irvine32.inc
+
+.data
+    prompt  BYTE "숫자를 입력하세요: ", 0
+    msgAvg  BYTE "입력한 5개 숫자의 평균: ", 0
+    sum     SDWORD 0
+    avg     SDWORD 0
+
+.code
+main PROC
+    call Clrscr
+
+    mov ecx, 5
+    mov sum, 0
+
+input_loop:
+    mov edx, OFFSET prompt
+    call WriteString
+
+    call ReadInt
+    add sum, eax
+    
+    loop input_loop
+
+    mov eax, sum
+    mov ebx, 5
+    
+    cdq
+    idiv ebx
+    
+    mov avg, eax
+
+    call Crlf
+    mov edx, OFFSET msgAvg
+    call WriteString
+    
+    mov eax, avg
+    call WriteInt
+    call Crlf
+
+    exit
+main ENDP
+
+END main
