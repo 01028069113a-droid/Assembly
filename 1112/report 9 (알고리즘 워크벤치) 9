@@ -1,0 +1,32 @@
+9. Str_trim 프로시저의 64비트 버전을 만드시오.
+
+정답:
+; RCX = 문자열 포인터 (또는 Windows x64 호출 규번에 따라 RCX에 문자열 주소, RDX에 자를 문자 전달)
+Str_trim64 PROC
+    ; (입력: RCX = string pointer, DL = char to trim)
+    push rsi
+    mov rsi, rcx
+
+    ; 문자열 끝(NULL 문자) 찾기
+find_end:
+    cmp byte ptr [rsi], 0
+    je found_null
+    inc rsi
+    jmp find_end
+found_null:
+    dec rsi             ; 마지막 실제 문자를 가리킴
+
+trim_loop:
+    cmp rsi, rcx
+    jb done_trim
+    mov al, [rsi]
+    cmp al, dl
+    jne done_trim
+    mov byte ptr [rsi], 0  ; 문자열 끝을 당겨오거나 공백/지정문자 제거
+    dec rsi
+    jmp trim_loop
+
+done_trim:
+    pop rsi
+    ret
+Str_trim64 ENDP
