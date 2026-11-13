@@ -1,0 +1,55 @@
+9. 이진 탐색 (Binary Search)
+
+이 장에 제시된 이진 탐색 프로시저를 재작성하여, mid, first, last를 위해 레지스터를 사용하도록 하시오. 
+레지스터의 용도를 명확히 하는 주석을 추가하시오.
+
+정답:
+BinarySearch PROC USES ebx edx esi edi,
+    pArray:PTR DWORD,
+    searchVal:DWORD,
+    count:DWORD
+; 이진 탐색 (레지스터 기반 first, last, mid 활용)
+; EBX: first (시작 인덱스)
+; EDI: last (마지막 인덱스)
+; ESI: mid (중간 인덱스)
+
+    xor ebx, ebx                ; first = 0
+    mov edi, count
+    dec edi                     ; last = count - 1
+    mov edx, searchVal          ; EDX = 찾고자 하는 값
+
+search_loop:
+    cmp ebx, edi
+    jg not_found                ; first > last 이면 탐색 실패 (ZF = 0)
+
+    ; mid = (first + last) / 2 계산
+    mov esi, ebx
+    add esi, edi
+    shr esi, 1                  ; ESI = mid
+
+    ; 배열 요소와 비교 (pArray[esi * 4])
+    mov ecx, pArray
+    mov eax, [ecx + esi * 4]
+    cmp eax, edx
+    je found                    ; 같으면 찾음
+    jl go_right                 ; 배열 값이 작으면 우측 탐색 (first = mid + 1)
+
+    ; 좌측 탐색 (last = mid - 1)
+    mov edi, esi
+    dec edi
+    jmp search_loop
+
+go_right:
+    mov ebx, esi
+    inc ebx
+    jmp search_loop
+
+found:
+    mov eax, esi                ; EAX에 찾은 인덱스 저장
+    cmp eax, eax                ; ZF = 1 설정 (성공)
+    ret
+
+not_found:
+    or eax, 1                   ; ZF = 0 설정 (실패)
+    ret
+BinarySearch ENDP
