@@ -1,0 +1,46 @@
+2. Str_concat 프로시저 (Str_concat Procedure)
+
+대상(target) 문자열의 끝에 원본(source) 문자열을 이어 붙이는 Str_concat이라는 프로시저를 작성하시오. 대상 문자열에는 새로운 문자들을 
+수용할 충분한 공간이 있어야 한다. 원본 문자열과 대상 문자열의 포인터를 전달하시오.
+
+정답:
+
+INCLUDE Irvine32.inc
+
+Str_concat PROTO,
+    target:PTR BYTE,
+    source:PTR BYTE
+
+.data
+targetStr BYTE "ABCDE", 10 DUP(0)
+sourceStr BYTE "FGH", 0
+
+.code
+main PROC
+    INVOKE Str_concat, ADDR targetStr, ADDR sourceStr
+    mov edx, OFFSET targetStr
+    call WriteString        ; 출력 결과: ABCDEFGH
+    call Crlf
+    exit
+main ENDP
+
+;-----------------------------------------------------------
+Str_concat PROC USES eax ecx esi edi,
+    target:PTR BYTE,
+    source:PTR BYTE
+; target 문자열의 끝을 찾아 source 문자열을 이어 붙임
+;-----------------------------------------------------------
+    INVOKE Str_length, target   ; EAX에 target의 길이가 반환됨
+    mov edi, target
+    add edi, eax                ; EDI가 target의 NULL 문자를 가리키도록 이동
+
+    mov esi, source
+    INVOKE Str_length, source   ; EAX에 source의 길이가 반환됨
+    mov ecx, eax
+    inc ecx                     ; 끝의 NULL 문자까지 함께 복사하기 위해 +1
+
+    cld
+    rep movsb                   ; source의 내용을 target 끝에 복사
+    ret
+Str_concat ENDP
+END main
