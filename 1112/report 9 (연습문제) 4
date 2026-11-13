@@ -1,0 +1,86 @@
+4. Str_find 프로시저 (Str_find Procedure)
+
+대상(target) 문자열 내부에서 원본(source) 문자열이 처음으로 일치하는 위치를 검색하고 그 일치 위치를 반환하는 Str_find라는 프로시저를 
+작성하시오. 입력 매개변수는 원본 문자열에 대한 포인터와 대상 문자열에 대한 포인터여야 한다. 일치하는 항목을 찾으면 
+프로시저는 Zero 플래그(ZF)를 설정(1)하고 EAX는 대상 문자열 내의 일치 위치를 가리킨다. 그렇지 않으면 Zero 플래그는 해제(0)되고 
+EAX는 정의되지 않는다.
+
+정답:
+INCLUDE Irvine32.inc
+
+Str_find PROTO,
+    source:PTR BYTE,
+    target:PTR BYTE
+
+.data
+targetStr BYTE "123ABC342432", 0
+sourceStr BYTE "ABC", 0
+foundMsg  BYTE "Found at offset: ", 0
+notFoundMsg BYTE "Not found.", 0
+
+.code
+main PROC
+    INVOKE Str_find, ADDR sourceStr, ADDR targetStr
+    jnz not_found
+
+    mov edx, OFFSET foundMsg
+    call WriteString
+    sub eax, OFFSET targetStr   ; 시작 주소 기준 상대 인덱스(3) 계산
+    call WriteDec
+    call Crlf
+    jmp quit
+
+not_found:
+    mov edx, OFFSET notFoundMsg
+    call WriteString
+    call Crlf
+
+quit:
+    exit
+main ENDP
+
+;-----------------------------------------------------------
+Str_find PROC USES ebx ecx edx esi edi,
+    source:PTR BYTE,
+    target:PTR BYTE
+; target 안에서 source를 찾아 일치 시 ZF=1 및 EAX=일치 주소 반환
+;-----------------------------------------------------------
+    INVOKE Str_length, target
+    mov ebx, eax                ; EBX = target 길이
+    INVOKE Str_length, source
+    mov edx, eax                ; EDX = source 길이
+
+    cmp edx, 0                  ; source가 빈 문자열이면 찾지 못함 처리
+    je not_found
+    cmp ebx, edx                ; target이 source보다 짧으면 찾지 못함 처리
+    jb not_found
+
+    sub ebx, edx                ; 탐색할 최대 시작 인덱스 횟수 = target길이 - source길이
+    inc ebx                     ; 마지막 위치 포함을 위해 +1
+    mov ecx, ebx                ; 외부 루프 카운터 설정
+    mov edi, target             ; 현재 비교 시작 위치 포인터
+
+outer_loop:
+    push ecx
+    push edi
+    mov esi, source
+    mov ecx, edx                ; source 길이만큼 문자 단위 비교
+    cld
+    repe cmpsb                  ; [ESI]와 [EDI]가 같을 동안 반복 비교
+    pop edi
+    pop ecx
+    je found                    ; 모든 문자가 일치했으면(ZF=1) 성공
+
+    inc edi                     ; 다음 시작 위치로 1바이트 이동
+    loop outer_loop
+
+not_found:
+    or eax, 1                   ; Zero 플래그 해제 (ZF = 0)
+    ret
+
+found:
+    mov eax, edi                ; 일치한 시작 주소를 EAX에 저장
+    cmp eax, eax                ; Zero 플래그 설정 (ZF = 1)
+    ret
+Str_find ENDP
+END main
