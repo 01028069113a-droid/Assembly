@@ -1,0 +1,9 @@
+4. sourcew와 targetw라는 이름의 16비트 값 배열 두 개를 비교하는 CMPSW 사용 명령어를 작성하시오.
+
+정답:
+
+cld                 ; 방향 플래그 지우기 (인덱스가 증가하도록 설정)
+mov esi, OFFSET sourcew
+mov edi, OFFSET targetw
+mov ecx, LENGTHOF sourcew
+repe cmpsw          ; 두 배열의 값이 같을 동안 반복 비교
