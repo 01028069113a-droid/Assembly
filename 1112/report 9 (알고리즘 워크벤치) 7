@@ -1,0 +1,6 @@
+7. Str_trim 프로시저를 호출하여 문자열 끝에 있는 모든 "@" 문자를 제거하는 방법을 보이시오.
+
+정답:
+mov edx, OFFSET targetString
+mov al, '@'
+INVOKE Str_trim, edx, al
