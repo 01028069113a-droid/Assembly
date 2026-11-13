@@ -1,0 +1,42 @@
+8. 버블 정렬 (Bubble Sort)
+
+섹션 9.5.1의 BubbleSort 프로시저에 변수(교환 플래그, exchange flag로 흔히 알려짐)를 추가하여, 내부 루프 내에서 한 쌍의 값이 
+교환될 때마다 이 변수가 1로 설정되도록 하시오. 배열을 한 번 완전히 통과하는 동안 어떠한 교환도 일어나지 않았음을 발견하면, 
+이 변수를 사용하여 정렬이 정상적으로 완료되기 전에 루프를 빠져나오도록 하시오.
+
+정답:
+BubbleSort PROC USES eax ecx esi edx,
+    pArray:PTR DWORD,
+    Count:DWORD
+; 교환 플래그를 사용하여 최적화된 버블 정렬
+    mov ecx, Count
+    dec ecx                     ; 외곽 루프 카운터 = Count - 1
+
+outer_loop:
+    push ecx
+    mov esi, pArray
+    xor edx, edx                ; EDX는 교환 플래그 (0: 교환 없음)
+
+inner_loop:
+    mov eax, [esi]
+    cmp eax, [esi+4]
+    jle no_swap                 ; 앞의 값이 작거나 같으면 교환 생략
+
+    ; 값 교환 (Swap)
+    xchg eax, [esi+4]
+    mov [esi], eax
+    mov edx, 1                  ; 교환 발생 -> 플래그를 1로 설정
+
+no_swap:
+    add esi, 4
+    loop inner_loop
+
+    pop ecx
+    cmp edx, 0                  ; 이번 패스에서 교환이 전혀 없었는지 확인
+    je sorted_done              ; 교환이 없었다면 조기 종료
+
+    loop outer_loop
+
+sorted_done:
+    ret
+BubbleSort ENDP
