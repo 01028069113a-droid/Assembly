@@ -1,0 +1,17 @@
+8. Irvine32 라이브러리의 Str_ucase 프로시저를 수정하여 모든 문자를 소문자로(lower case) 바꾸도록 만드는 방법을 보이시오.
+
+정답:
+; 프로시저 내부 루프 발췌 예시:
+L1:
+    mov al, [esi]
+    cmp al, 0
+    je finished
+    cmp al, 'A'
+    jb next_char
+    cmp al, 'Z'
+    ja next_char
+    or byte ptr [esi], 20h  ; 대문자를 소문자로 변환 (ASCII 코드에 20h 더하기)
+next_char:
+    inc esi
+    jmp L1
+finished:
