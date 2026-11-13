@@ -1,0 +1,11 @@
+6. Str_compare 프로시저를 사용하여 두 입력 문자열 중 더 긴 것을 판별하고 콘솔 창에 출력하는 명령어 시퀀스를 작성하시오.
+
+정답:
+INVOKE Str_compare, ADDR string1, ADDR string2
+ja string1_greater  ; string1이 더 클 경우
+; string2가 더 크거나 같을 때의 처리
+INVOKE Str_writeString, ADDR string2
+jmp done
+string1_greater:
+INVOKE Str_writeString, ADDR string1
+done:
