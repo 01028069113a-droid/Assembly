@@ -1,0 +1,12 @@
+5. wordArray라는 이름의 배열에서 SCASW를 사용하여 16비트 값 0100h를 스캔하고, 일치하는 멤버의 오프셋을 EAX 레지스터에 
+복사하는 명령어를 작성하시오.
+
+정답:
+
+cld
+mov edi, OFFSET wordArray
+mov ecx, LENGTHOF wordArray
+mov ax, 0100h
+repne scasw         ; 0100h 값을 찾을 때까지 스캔
+sub edi, 2          ; 일치한 항목의 시작 위치로 EDI 조정 (SCASW 후 EDI가 증가하므로)
+mov eax, edi        ; 오프셋을 EAX에 복사
