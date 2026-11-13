@@ -1,0 +1,72 @@
+5. Str_nextWord 프로시저 (Str_nextWord Procedure)
+
+특정 구분자(delimiter) 문자가 처음 나타나는 위치를 찾아 문자열을 스캔하고, 그 구분자를 널 바이트(0)로 교체하는 Str_nextWord라는 
+프로시저를 작성하시오. 입력 매개변수는 문자열 포인터와 구분자 문자 두 개이다. 호출 후 구분자를 찾았다면 Zero 플래그(ZF)가 설정(1)되고 
+EAX에는 구분자 바로 다음 문자의 오프셋이 담긴다. 그렇지 않으면 Zero 플래그는 해제(0)되고 EAX는 정의되지 않는다. 다음 예제 코드는 target의 
+주소와 구분자로 쉼표(,)를 전달한다:
+
+정답:
+.data
+target BYTE "Johnson,Calvin",0
+.code
+INVOKE Str_nextWord, ADDR target, ','
+jnz notFound
+
+정답 코드 (테스트 드라이버 포함):
+INCLUDE Irvine32.inc
+
+Str_nextWord PROTO,
+    pString:PTR BYTE,
+    delimiter:BYTE
+
+.data
+target BYTE "Johnson,Calvin", 0
+
+.code
+main PROC
+    INVOKE Str_nextWord, ADDR target, ','
+    jnz notFound
+
+    mov edx, OFFSET target      ; 첫 번째 토큰 출력 ("Johnson")
+    call WriteString
+    call Crlf
+
+    mov edx, eax                ; EAX가 가리키는 다음 토큰 출력 ("Calvin")
+    call WriteString
+    call Crlf
+
+notFound:
+    exit
+main ENDP
+
+;-----------------------------------------------------------
+Str_nextWord PROC USES esi,
+    pString:PTR BYTE,
+    delimiter:BYTE
+; 문자열에서 delimiter를 찾아 NULL(0)로 바꾸고,
+; 찾았으면 ZF=1 및 EAX=다음 문자 주소 반환
+;-----------------------------------------------------------
+    mov esi, pString
+    mov al, delimiter
+
+L1:
+    mov ah, [esi]               ; 현재 문자 로드
+    cmp ah, 0                   ; 문자열 끝(NULL)에 도달했는지 확인
+    je not_found
+    cmp ah, al                  ; 구분자와 일치하는지 확인
+    je found
+    inc esi
+    jmp L1
+
+found:
+    mov byte ptr [esi], 0       ; 구분자를 NULL 바이트로 교체
+    inc esi                     ; 구분자 바로 다음 문자로 이동
+    mov eax, esi                ; EAX에 다음 문자 오프셋 저장
+    cmp eax, eax                ; Zero 플래그 설정 (ZF = 1)
+    ret
+
+not_found:
+    or al, 1                    ; Zero 플래그 해제 (ZF = 0, EAX는 비영점 상태 유지)
+    ret
+Str_nextWord ENDP
+END main
