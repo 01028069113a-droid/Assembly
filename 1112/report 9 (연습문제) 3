@@ -1,0 +1,53 @@
+3. Str_remove 프로시저 (Str_remove Procedure)
+
+문자열에서 $n$개의 문자를 제거하는 Str_remove라는 프로시저를 작성하시오. 문자가 제거될 문자열 내 위치의 포인터와, 
+제거할 문자 수를 지정하는 정수를 전달하시오.   
+
+정답:
+
+INCLUDE Irvine32.inc
+
+Str_remove PROTO,
+    pStart:PTR BYTE,
+    nChars:DWORD
+
+.data
+target BYTE "abcxxxxdefghijklmop", 0
+
+.code
+main PROC
+    INVOKE Str_remove, ADDR [target+3], 4
+    mov edx, OFFSET target
+    call WriteString        ; 출력 결과: abcdefghijklmop
+    call Crlf
+    exit
+main ENDP
+
+;-----------------------------------------------------------
+Str_remove PROC USES eax ecx esi edi,
+    pStart:PTR BYTE,
+    nChars:DWORD
+; pStart 위치부터 nChars개의 문자를 삭제하고 뒤쪽 문자열을 앞으로 당김
+;-----------------------------------------------------------
+    INVOKE Str_length, pStart   ; pStart부터 문자열 끝까지의 길이 확인
+    mov ecx, eax
+    sub ecx, nChars             ; 앞으로 당겨올 남은 문자 수 계산
+    jl clear_all                ; 지울 개수가 남은 길이보다 크거나 같을 경우 처리
+
+    mov edi, pStart             ; 덮어쓸 목적지 (삭제 시작 위치)
+    mov esi, pStart
+    add esi, nChars             ; 당겨올 원본 위치 (삭제할 길이만큼 뒤)
+
+    inc ecx                     ; 마지막 NULL 문자까지 복사하기 위해 +1
+    cld
+    rep movsb
+    jmp done
+
+clear_all:
+    mov edi, pStart
+    mov byte ptr [edi], 0       ; 시작 위치를 바로 NULL로 종료
+
+done:
+    ret
+Str_remove ENDP
+END main
