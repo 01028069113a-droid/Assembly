@@ -1,0 +1,68 @@
+7. 에라토스테네스의 체 (Sieve of Eratosthenes)
+
+동명의 고대 그리스 수학자가 발명한 에라토스테네스의 체는 주어진 범위 내에서 모든 소수를 찾는 빠른 방법을 제공한다. 이 알고리즘은 다음 방식으로 1을 삽입하여 위치가 "마크(marked)"되는 바이트 배열을 생성하는 것을 포함한다: 소수인 2번 위치부터 시작하여, 2의 배수인 각 배열 위치에 1을 삽입한다. 그런 다음 다음 소수인 3의 배수에도 똑같이 수행한다. 3 다음의 다음 소수인 5를 찾고, 5의 배수인 모든 위치를 마크한다. 소수의 모든 배수를 찾을 때까지 이 방식을 계속한다. 배열에서 마크되지 않은 나머지 위치들은 어떤 숫자가 소수인지 나타낸다. 이 프로그램을 위해 65,000개의 원소를 가진 배열을 만들고 2와 65,000 사이의 모든 소수를 출력하시오. 초기화되지 않은 데이터 세그먼트에 배열을 선언하고(섹션 3.4.11 참조), STOSB를 사용하여 0으로 채우시오.
+
+정답:
+INCLUDE Irvine32.inc
+
+.data
+MAX = 65000
+primeArray BYTE MAX DUP(?)
+
+.code
+main PROC
+    ; 1. STOSB를 사용하여 배열을 0으로 초기화
+    mov edi, OFFSET primeArray
+    mov ecx, MAX
+    mov al, 0
+    cld
+    rep stosb
+
+    ; 2. 에라토스테네스의 체 알고리즘 구현
+    mov primeArray[0], 1
+    mov primeArray[1], 1        ; 0과 1은 소수가 아님
+
+    mov esi, 2                  ; 시작 소수 = 2
+outer_loop:
+    mov eax, esi
+    mul eax                     ; EAX = ESI * ESI
+    cmp eax, MAX
+    jae print_primes            ; ESI^2 >= MAX 이면 종료
+
+    mov al, primeArray[esi]
+    cmp al, 0
+    jne next_esi                ; 이미 마크된(소수가 아닌) 경우 패스
+
+    ; esi의 배수들을 1로 마킹
+    mov ebx, esi
+    add ebx, esi                ; ebx = esi * 2부터 시작
+mark_multiples:
+    cmp ebx, MAX
+    jae next_esi
+    mov primeArray[ebx], 1
+    add ebx, esi
+    jmp mark_multiples
+
+next_esi:
+    inc esi
+    jmp outer_loop
+
+print_primes:
+    ; 마크되지 않은(0인) 인덱스(소수)들을 콘솔에 출력
+    mov ecx, MAX
+    mov esi, 2
+display_loop:
+    cmp byte ptr primeArray[esi], 0
+    jne skip_print
+    mov eax, esi
+    call WriteDec
+    mov al, ' '
+    call WriteChar
+skip_print:
+    inc esi
+    loop display_loop
+
+    call Crlf
+    exit
+main ENDP
+END main
