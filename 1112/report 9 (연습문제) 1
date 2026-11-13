@@ -1,0 +1,53 @@
+1. 개선된 Str_copy 프로시저 (Improved Str_copy Procedure)
+
+이 장에서 소개된 Str_copy 프로시저는 복사할 문자의 수를 제한하지 않는다. 복사할 최대 문자 수를 나타내는 추가 입력 매개변수를 받는 
+새로운 버전(Str_copyN이라는 이름)을 만드시오.
+
+정답:
+INCLUDE Irvine32.inc
+
+Str_copyN PROTO,
+    source:PTR BYTE,
+    target:PTR BYTE,
+    maxChars:DWORD
+
+.data
+srcStr BYTE "Assembly Language Programming", 0
+dstStr BYTE 20 DUP(0)
+
+.code
+main PROC
+    INVOKE Str_copyN, ADDR srcStr, ADDR dstStr, 8
+    mov edx, OFFSET dstStr
+    call WriteString        ; 출력 결과: Assembly
+    call Crlf
+    exit
+main ENDP
+
+;-----------------------------------------------------------
+Str_copyN PROC USES eax ecx esi edi,
+    source:PTR BYTE,
+    target:PTR BYTE,
+    maxChars:DWORD
+; 최대 maxChars 개수만큼 문자열을 복사하고 끝에 NULL을 추가함
+;-----------------------------------------------------------
+    mov ecx, maxChars
+    mov esi, source
+    mov edi, target
+    cld                     ; 방향 플래그 클리어 (순방향 이동)
+
+L1:
+    cmp ecx, 0              ; 최대 복사 개수에 도달했는지 확인
+    je done
+    lodsb                   ; [ESI]에서 AL로 1바이트 로드 후 ESI 증가
+    cmp al, 0               ; 원본 문자열의 끝(NULL)인지 확인
+    je done
+    stosb                   ; AL의 값을 [EDI]에 저장 후 EDI 증가
+    dec ecx
+    jmp L1
+
+done:
+    mov byte ptr [edi], 0   ; 대상 문자열 끝에 반드시 NULL 추가
+    ret
+Str_copyN ENDP
+END main
