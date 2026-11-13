@@ -1,0 +1,70 @@
+14. Trimming a Set of Characters (일련의 문자 세트 제거)
+
+문자열의 끝(후행)에서 필터 문자 세트에 포함된 모든 문자의 인스턴스를 호출자가 제거할 수 있도록 Str_trim 프로시저의 변형 버전을 만드시오. 
+예를 들어, "ABC#$&" 문자열에 대한 포인터와 "%#!;$&*"를 포함하는 필터 문자 배열에 대한 포인터를 전달하여 호출한다면, 결과 문자열은 "ABC"가 되어야 한다.
+
+정답:
+INCLUDE Irvine32.inc
+
+Str_trimSet PROTO,
+    pString:PTR BYTE,
+    pFilter:PTR BYTE
+
+.data
+testStr BYTE "ABC#$&", 0
+filterSet BYTE "%#!;$&*", 0
+
+.code
+main PROC
+    INVOKE Str_trimSet, ADDR testStr, ADDR filterSet
+    mov edx, OFFSET testStr
+    call WriteString        ; 출력 결과: ABC
+    call Crlf
+    exit
+main ENDP
+
+;-----------------------------------------------------------
+Str_trimSet PROC USES eax ebx ecx edx esi edi,
+    pString:PTR BYTE,
+    pFilter:PTR BYTE
+; 문자열 끝에서 필터 세트에 포함된 문자들을 찾아 제거(NULL로 치환)
+;-----------------------------------------------------------
+    ; 1. 문자열의 끝(NULL 문자 직전) 찾기
+    mov esi, pString
+find_end:
+    cmp byte ptr [esi], 0
+    je found_null
+    inc esi
+    jmp find_end
+found_null:
+    dec esi                 ; ESI는 문자열의 마지막 실제 문자를 가리킴
+
+trim_loop:
+    cmp esi, pString        ; 문자열의 시작보다 앞으로 가거나 같아지면 중지
+    jb done
+
+    mov al, [esi]           ; 현재 문자
+
+    ; 필터 세트에 포함되어 있는지 확인
+    mov edi, pFilter
+check_filter:
+    mov bl, [edi]
+    cmp bl, 0               ; 필터 끝에 도달했으면 포함되지 않음
+    je done_trim
+    cmp al, bl              ; 필터 문자와 일치하는지 확인
+    je remove_char          ; 일치하면 제거 대상
+    inc edi
+    jmp check_filter
+
+remove_char:
+    mov byte ptr [esi], 0   ; 해당 위치를 NULL로 바꿈 (뒤에서부터 잘라냄)
+    dec esi
+    jmp trim_loop
+
+done_trim:
+    nop
+
+done:
+    ret
+Str_trimSet ENDP
+END main
