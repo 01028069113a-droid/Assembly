@@ -1,148 +1,147 @@
 문제:
+
 두개의 숫자를 입력받고 사칙연산 결과와 AX,BX,CX,DX 레지스터의 내용을 화면에 출력하는 프로그램을 작성하시오.
 
 .MODEL SMALL
 .STACK 100H
 
 .DATA
-    msg1        DB 0DH, 0AH, '첫 번째 숫자 입력 (0~255): $'
-    msg2        DB 0DH, 0AH, '두 번째 숫자 입력 (0~255): $'
-    msg_add     DB 0DH, 0AH, '=== 덧셈 (ADD) ===', 0DH, 0AH, '결과: $'
-    msg_sub     DB 0DH, 0AH, '=== 뺄셈 (SUB) ===', 0DH, 0AH, '결과: $'
-    msg_mul     DB 0DH, 0AH, '=== 곱셈 (MUL) ===', 0DH, 0AH, '결과: $'
-    msg_div_q   DB 0DH, 0AH, '=== 나눗셈 (DIV) ===', 0DH, 0AH, '몫: $'
-    msg_div_r   DB ' / 나머지: $'
-    msg_div_err DB 0DH, 0AH, '=== 나눗셈 (DIV) ===', 0DH, 0AH, '오류: 0으로 나눌 수 없습니다.$'
+    msg1        DB 0DH, 0AH, '첫 번째 숫자: $'
+    msg2        DB 0DH, 0AH, '두 번째 숫자: $'
 
-    lbl_ax      DB 0DH, 0AH, '  AX = 0x$'
-    lbl_bx      DB '  BX = 0x$'
-    lbl_cx      DB '  CX = 0x$'
-    lbl_dx      DB '  DX = 0x$'
+    hdr_add     DB 0DH, 0AH, '[덧셈] '
+    lbl_res     DB '결과: $'
+    hdr_sub     DB 0DH, 0AH, '[뺄셈] 결과: $'
+    hdr_mul     DB 0DH, 0AH, '[곱셈] 결과(DX:AX 16진): $'
+    hdr_div_q   DB 0DH, 0AH, '[나눗셈] 몫: $'
+    hdr_div_r   DB ', 나머지: $'
+    msg_div_err DB 0DH, 0AH, '[나눗셈] 0으로 나눌 수 없습니다.$'
+
+    lbl_ax      DB 0DH, 0AH, '  AX=0x$'
+    lbl_bx      DB ' BX=0x$'
+    lbl_cx      DB ' CX=0x$'
+    lbl_dx      DB ' DX=0x$'
 
     num1        DW 0
     num2        DW 0
-    in_buf      DB 6, 0, 6 DUP(0)    ; DOS 0AH 버퍼 (최대 5글자)
+    in_buf      DB 6, 0, 6 DUP(0)
 
 .CODE
 MAIN PROC
     MOV AX, @DATA
     MOV DS, AX
 
-    ; 1. 첫 번째 숫자 입력
+    ; 두 숫자 입력
     LEA DX, msg1
-    MOV AH, 09H
-    INT 21H
+    CALL PRINT_STR
     CALL READ_UINT16
     MOV num1, AX
 
-    ; 2. 두 번째 숫자 입력
     LEA DX, msg2
-    MOV AH, 09H
-    INT 21H
+    CALL PRINT_STR
     CALL READ_UINT16
     MOV num2, AX
 
-    ; 3. 덧셈 (num1 + num2)
+    ; 1. 덧셈 (AX = num1 + num2)
     MOV AX, num1
     MOV BX, num2
-    MOV CX, 0011H
-    MOV DX, 0022H
-    ADD AX, BX            ; AX = num1 + num2
-
-    PUSH AX               ; 출력용 결과 임시 저장
-    LEA DX, msg_add
-    MOV AH, 09H
-    INT 21H
-    POP AX
-    PUSH AX
-    CALL PRINT_UINT16     ; 10진수 결과 출력
-    POP AX
-    CALL PRINT_REGS       ; 현재 AX, BX, CX, DX 출력
-
-    ; 4. 뺄셈 (num1 - num2)
-    MOV AX, num1
-    MOV BX, num2
-    MOV CX, 0033H
-    MOV DX, 0044H
-    SUB AX, BX            ; AX = num1 - num2
+    ADD AX, BX
 
     PUSH AX
-    LEA DX, msg_sub
-    MOV AH, 09H
-    INT 21H
+    LEA DX, hdr_add
+    CALL PRINT_STR
     POP AX
     PUSH AX
-    CALL PRINT_SINT16     ; 부호 있는 10진수 결과 출력
+    CALL PRINT_UINT16
     POP AX
     CALL PRINT_REGS
 
-    ; 5. 곱셈 (num1 * num2)
+    ; 2. 뺄셈 (AX = num1 - num2)
     MOV AX, num1
     MOV BX, num2
-    MOV CX, 0055H
-    MOV DX, 0000H
-    MUL BX                ; DX:AX = AX * BX
+    SUB AX, BX
 
-    PUSH DX               ; 상위 워드(DX) 보존
-    PUSH AX               ; 하위 워드(AX) 보존
-    LEA DX, msg_mul
-    MOV AH, 09H
-    INT 21H
+    PUSH AX
+    LEA DX, hdr_sub
+    CALL PRINT_STR
+    POP AX
+    PUSH AX
+    CALL PRINT_SINT16
+    POP AX
+    CALL PRINT_REGS
+
+    ; 3. 곱셈 (DX:AX = num1 * num2)
+    MOV AX, num1
+    MOV BX, num2
+    MUL BX
+
+    PUSH DX
+    PUSH AX
+    LEA DX, hdr_mul
+    CALL PRINT_STR
     POP AX
     POP DX
     PUSH DX
     PUSH AX
-    CALL PRINT_UINT32     ; 32비트 곱셈 결과 출력
+    CALL PRINT_HEX16       ; 상위 DX 출력
+    POP AX
+    POP DX
+    PUSH DX
+    PUSH AX
+    CALL PRINT_HEX16       ; 하위 AX 출력 (AX에 DX 값 넣고 호출)
     POP AX
     POP DX
     CALL PRINT_REGS
 
-    ; 6. 나눗셈 (num1 / num2)
+    ; 4. 나눗셈 (AX = 몫, DX = 나머지)
     MOV BX, num2
     CMP BX, 0
-    JE DIV_BY_ZERO
+    JE DIV_ZERO
 
     MOV AX, num1
-    MOV DX, 0000H         ; 상위 워드 초기화 (DX:AX)
-    MOV CX, 0077H
-    DIV BX                ; AX = 몫, DX = 나머지
+    XOR DX, DX             ; DX = 0 (DX:AX 32비트 피제수 준비)
+    DIV BX
 
-    PUSH DX               ; 나머지 보존
-    PUSH AX               ; 몫 보존
-    LEA DX, msg_div_q
-    MOV AH, 09H
-    INT 21H
+    PUSH DX
+    PUSH AX
+    LEA DX, hdr_div_q
+    CALL PRINT_STR
     POP AX
     PUSH AX
-    CALL PRINT_UINT16     ; 몫 출력
+    CALL PRINT_UINT16      ; 몫 출력
 
-    LEA DX, msg_div_r
-    MOV AH, 09H
-    INT 21H
+    LEA DX, hdr_div_r
+    CALL PRINT_STR
     POP AX
     POP DX
     PUSH DX
     PUSH AX
     MOV AX, DX
-    CALL PRINT_UINT16     ; 나머지 출력
+    CALL PRINT_UINT16      ; 나머지 출력
     POP AX
     POP DX
     CALL PRINT_REGS
-    JMP EXIT_PROG
+    JMP DONE
 
-DIV_BY_ZERO:
+DIV_ZERO:
     LEA DX, msg_div_err
-    MOV AH, 09H
-    INT 21H
+    CALL PRINT_STR
 
-EXIT_PROG:
+DONE:
     MOV AH, 4CH
     INT 21H
 MAIN ENDP
 
-;-----------------------------------------------------
-; 10진수 문자열 입력 -> AX에 부호 없는 정수로 변환
-;-----------------------------------------------------
+; --- 문자열 출력 (DX = '$' 종료 문자열 오프셋) ---
+PRINT_STR PROC
+    PUSH AX
+    MOV AH, 09H
+    INT 21H
+    POP AX
+    RET
+PRINT_STR ENDP
+
+; --- 10진수 문자열 입력 -> AX ---
 READ_UINT16 PROC
     PUSH BX
     PUSH CX
@@ -155,31 +154,28 @@ READ_UINT16 PROC
 
     MOV SI, OFFSET in_buf + 2
     MOV CL, [in_buf + 1]
-    MOV CH, 0
-    MOV AX, 0
+    XOR CH, CH
+    XOR AX, AX
     MOV BX, 10
+    JCXZ READ_END
 
-    JCXZ DONE_READ
-
-PARSE_LOOP:
+READ_LOOP:
     MOV DL, [SI]
     CMP DL, '0'
-    JB NEXT_CHAR
+    JB READ_NEXT
     CMP DL, '9'
-    JA NEXT_CHAR
+    JA READ_NEXT
     SUB DL, '0'
-    MOV DH, 0
-
+    XOR DH, DH
     PUSH DX
-    MUL BX                ; AX = AX * 10
+    MUL BX
     POP DX
     ADD AX, DX
-
-NEXT_CHAR:
+READ_NEXT:
     INC SI
-    LOOP PARSE_LOOP
+    LOOP READ_LOOP
 
-DONE_READ:
+READ_END:
     POP SI
     POP DX
     POP CX
@@ -187,9 +183,7 @@ DONE_READ:
     RET
 READ_UINT16 ENDP
 
-;-----------------------------------------------------
-; AX의 부호 없는 16진수 값 출력 (4자리)
-;-----------------------------------------------------
+; --- AX 값을 4자리 16진수로 출력 ---
 PRINT_HEX16 PROC
     PUSH AX
     PUSH BX
@@ -198,20 +192,19 @@ PRINT_HEX16 PROC
 
     MOV BX, AX
     MOV CX, 4
-
-HEX_LOOP:
+HEX_L:
     ROL BX, 4
     MOV AL, BL
     AND AL, 0FH
     CMP AL, 9
-    JBE IS_DIGIT
+    JBE H_NUM
     ADD AL, 7
-IS_DIGIT:
+H_NUM:
     ADD AL, '0'
     MOV DL, AL
     MOV AH, 02H
     INT 21H
-    LOOP HEX_LOOP
+    LOOP HEX_L
 
     POP DX
     POP CX
@@ -220,42 +213,31 @@ IS_DIGIT:
     RET
 PRINT_HEX16 ENDP
 
-;-----------------------------------------------------
-; 현재 AX, BX, CX, DX 레지스터 내용을 16진수로 출력
-; (호출 전 레지스터 값이 훼손되지 않도록 스택 활용)
-;-----------------------------------------------------
+; --- 현재 AX, BX, CX, DX를 16진수로 출력 ---
 PRINT_REGS PROC
     PUSH AX
     PUSH BX
     PUSH CX
     PUSH DX
-
-    ; 원래 값들을 스택에서 읽어 임시 보관
-    MOV BP, SP
-    ; 스택 구조: [SP+6]=AX, [SP+4]=BX, [SP+2]=CX, [SP+0]=DX
+    MOV BP, SP             ; [BP+6]=AX, [BP+4]=BX, [BP+2]=CX, [BP+0]=DX
 
     LEA DX, lbl_ax
-    MOV AH, 09H
-    INT 21H
+    CALL PRINT_STR
     MOV AX, [BP+6]
     CALL PRINT_HEX16
 
     LEA DX, lbl_bx
-    MOV AH, 02H           ; 안전하게 문자열 출력 사용
-    MOV AH, 09H
-    INT 21H
+    CALL PRINT_STR
     MOV AX, [BP+4]
     CALL PRINT_HEX16
 
     LEA DX, lbl_cx
-    MOV AH, 09H
-    INT 21H
+    CALL PRINT_STR
     MOV AX, [BP+2]
     CALL PRINT_HEX16
 
     LEA DX, lbl_dx
-    MOV AH, 09H
-    INT 21H
+    CALL PRINT_STR
     MOV AX, [BP+0]
     CALL PRINT_HEX16
 
@@ -266,41 +248,38 @@ PRINT_REGS PROC
     RET
 PRINT_REGS ENDP
 
-;-----------------------------------------------------
-; AX 부호 없는 10진수 출력
-;-----------------------------------------------------
+; --- AX 부호 없는 10진수 출력 ---
 PRINT_UINT16 PROC
     PUSH AX
     PUSH BX
     PUSH CX
     PUSH DX
 
-    MOV CX, 0
+    XOR CX, CX
     MOV BX, 10
-
     CMP AX, 0
-    JNE DIV_10_LOOP
+    JNE U16_DIV
     MOV DL, '0'
     MOV AH, 02H
     INT 21H
-    JMP END_U16
+    JMP U16_END
 
-DIV_10_LOOP:
-    MOV DX, 0
+U16_DIV:
+    XOR DX, DX
     DIV BX
     PUSH DX
     INC CX
     CMP AX, 0
-    JNE DIV_10_LOOP
+    JNE U16_DIV
 
-PRINT_10_LOOP:
+U16_OUT:
     POP DX
     ADD DL, '0'
     MOV AH, 02H
     INT 21H
-    LOOP PRINT_10_LOOP
+    LOOP U16_OUT
 
-END_U16:
+U16_END:
     POP DX
     POP CX
     POP BX
@@ -308,9 +287,7 @@ END_U16:
     RET
 PRINT_UINT16 ENDP
 
-;-----------------------------------------------------
-; AX 부호 있는 10진수 출력 (뺄셈 음수 처리용)
-;-----------------------------------------------------
+; --- AX 부호 있는 10진수 출력 ---
 PRINT_SINT16 PROC
     TEST AX, 8000H
     JZ PRINT_UINT16
@@ -322,67 +299,5 @@ PRINT_SINT16 PROC
     NEG AX
     JMP PRINT_UINT16
 PRINT_SINT16 ENDP
-
-;-----------------------------------------------------
-; DX:AX 32비트 부호 없는 10진수 출력 (곱셈 결과용)
-;-----------------------------------------------------
-PRINT_UINT32 PROC
-    PUSH AX
-    PUSH BX
-    PUSH CX
-    PUSH DX
-    PUSH SI
-
-    ; 간단하게 DX가 0이면 16비트 출력으로 처리
-    CMP DX, 0
-    JNE BIG_MUL
-    CALL PRINT_UINT16
-    JMP END_U32
-
-BIG_MUL:
-    ; DX:AX를 10으로 나누는 루프
-    MOV CX, 0
-    MOV BX, 10
-U32_LOOP:
-    MOV SI, AX            ; 하위 워드 임시 저장
-    MOV AX, DX
-    MOV DX, 0
-    DIV BX                ; DX = 상위 나머지, AX = 상위 몫
-    PUSH AX               ; 새 상위 몫 저장
-    MOV AX, SI            ; 원래 하위 워드 복원 (DX에 이전 나머지 유지됨)
-    DIV BX                ; AX = 새 하위 몫, DX = 이번 10진 자릿수
-    PUSH DX               ; 자릿수 저장
-    INC CX
-    POP DX
-    MOV SI, DX            ; 자릿수 보관
-    POP DX                ; 새 상위 몫 -> DX
-    PUSH SI               ; 자릿수 다시 스택에
-    ; AX(새 하위 몫)와 DX(새 상위 몫)가 모두 0인지 확인
-    MOV SI, AX
-    OR SI, DX
-    MOV AX, SI
-    MOV SI, AX
-    ; 정확히 0 종료 판별을 위해 다시 정리
-    POP SI
-    PUSH SI
-    MOV AX, [SP+2]
-    JMP U32_NEXT
-
-U32_NEXT:
-    ; 32비트 출력은 16비트 곱셈 범위(최대 65535*65535)를 다루기 위해 간단히 16진 병기 가능
-    POP DX
-    ADD DL, '0'
-    MOV AH, 02H
-    INT 21H
-    LOOP U32_NEXT
-
-END_U32:
-    POP SI
-    POP DX
-    POP CX
-    POP BX
-    POP AX
-    RET
-PRINT_UINT32 ENDP
 
 END MAIN
