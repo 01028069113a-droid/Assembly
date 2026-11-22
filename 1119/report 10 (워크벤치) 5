@@ -1,0 +1,18 @@
+5번 문제
+번역: 화면에 단일 문자를 출력하는 mPrintChar이라는 매크로를 작성하시오. 두 개의 매개변수를 가져야 하며, 첫 번째 매개변수는 출력할 문자를 지정하고 
+두 번째 매개변수는 문자를 몇 번 반복할지 지정한다. 호출 예시는 다음과 같다.
+mPrintChar 'X',20
+
+정답:
+mPrintChar MACRO char, count
+    LOCAL L1
+    push ecx
+    push eax
+    mov ecx, count
+    mov al, char
+L1:
+    call WriteChar
+    loop L1
+    pop eax
+    pop ecx
+ENDM
