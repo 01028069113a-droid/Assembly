@@ -1,0 +1,26 @@
+4번 문제
+번역: Triangle 구조체 배열을 선언하시오. 각 삼각형의 Vertex1을 (0...10, 0...10) 범위의 임의 좌표로 초기화하는 루프를 작성하시오.
+
+정답: Irvine32의 RandomRange를 사용하면 0부터 n - 1까지의 난수를 생성하므로, 0...10 범위의 값을 얻으려면 11을 넘겨줘야 합니다. 
+(COORD의 X, Y 필드는 각각 16비트 정수입니다.)
+
+NUM_TRIANGLES = 10
+
+.data
+triArray Triangle NUM_TRIANGLES DUP(<>)
+
+.code
+mov ecx, NUM_TRIANGLES
+mov esi, OFFSET triArray
+
+L1:
+    mov eax, 11
+    call RandomRange
+    mov (Triangle PTR [esi]).Vertex1.X, ax
+
+    mov eax, 11
+    call RandomRange
+    mov (Triangle PTR [esi]).Vertex1.Y, ax
+
+    add esi, TYPE Triangle
+    loop L1
