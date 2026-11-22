@@ -1,0 +1,11 @@
+12번 문제
+번역: 기본 인자 초기화 값(default argument initializer)을 가진 매크로 매개변수의 예시를 보이시오.
+
+정답: 매크로 정의에서 매개변수 뒤에 :=기본값 형태로 지정하면, 호출 시 해당 인자를 생략했을 때 기본값이 자동으로 사용됩니다.
+mWriteMsg MACRO msg:="Default message"
+    mWrite msg
+ENDM
+
+; 호출 예시: 인자 생략 시 "Default message" 사용, 지정 시 전달한 문자열 사용
+mWriteMsg
+mWriteMsg "Custom message"
