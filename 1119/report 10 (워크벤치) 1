@@ -1,0 +1,10 @@
+1번 문제
+
+번역: 단일 16비트 WORD인 field1과 20개의 32비트 DWORD 배열인 field2라는 두 개의 필드를 포함하는 SampleStruct라는 구조체를 만드시오. 
+필드의 초기값은 정의되지 않은 상태(?)로 두어도 된다.
+
+정답:
+SampleStruct STRUCT
+    field1 WORD ?
+    field2 DWORD 20 DUP(?)
+SampleStruct ENDS
