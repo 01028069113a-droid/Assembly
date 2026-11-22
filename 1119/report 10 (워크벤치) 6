@@ -1,0 +1,9 @@
+6번 문제
+번역: 0과 n - 1 사이의 임의의 정수를 생성하는 mGenRandom이라는 매크로를 작성하시오. n을 유일한 매개변수로 두시오.
+
+정답: Irvine32의 RandomRange는 EAX에 상한값(n)을 넣고 호출하면 0부터 EAX - 1 사이의 난수를 EAX에 반환합니다.
+
+mGenRandom MACRO n
+    mov eax, n
+    call RandomRange
+ENDM
