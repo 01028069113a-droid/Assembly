@@ -1,0 +1,12 @@
+10번 문제
+번역: 10.2.5절의 mReadStr 매크로를 호출하는 다음 문장에 의해 생성되는 확장 코드(expanded code)를 보이시오.
+mReadStr customerName
+
+정답: Irvine32 10.2.5절의 mReadStr 매크로는 대상 버퍼의 주소를 EDX에 넣고 최대 입력 길이를 ECX에 설정한 뒤 ReadString을 호출합니다.
+push ecx
+push edx
+mov edx, OFFSET customerName
+mov ecx, SIZEOF customerName
+call ReadString
+pop edx
+pop ecx
