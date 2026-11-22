@@ -1,0 +1,6 @@
+2번 문제
+번역: SYSTEMTIME 구조체의 wHour 필드를 가져오는(읽어오는) 문장을 작성하시오.
+
+정답: 
+SYSTEMTIME 구조체 변수(예: sysTime)가 선언되어 있다고 가정할 때, wHour는 16비트(WORD) 필드이므로 AX 등 16비트 레지스터로 읽어올 수 있습니다.
+mov ax, sysTime.wHour
