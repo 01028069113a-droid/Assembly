@@ -1,0 +1,26 @@
+2번
+다음과 같이 구조체가 정의되어 있다고 가정하자.
+RentalInvoice STRUCT
+   invoiceNum BYTE 5 DUP(' ')
+   dailyPrice WORD ?
+   daysRented WORD ?
+RentalInvoice ENDS
+
+a. rentals RentalInvoice <>
+b. RentalInvoice rentals <>
+c. march RentalInvoice <'12345',10,0>
+d. RentalInvoice <,10,0>
+e. current RentalInvoice <,15,0,0>
+
+정답:
+
+a. 유효함(Valid): 구조체 변수 이름(rentals)을 먼저 쓰고 구조체 타입(RentalInvoice)과 기본값 초기화 기호(<>)를 올바르게 작성했습니다. 
+각 필드는 구조체 정의의 기본값(' ', ?, ?)으로 초기화됩니다.
+
+b. 유효하지 않음(Invalid): MASM 구조체 변수 선언 문법은 변수이름 구조체이름 <초기값> 순서입니다. 타입과 변수 이름의 순서가 바뀌었습니다.
+
+c. 유효함(Valid): 5바이트 문자열 '12345'가 invoiceNum(5바이트)에 맞고, dailyPrice에 10, daysRented에 0이 순서대로 할당됩니다.
+
+d. 유효하지 않음(Invalid): 구조체 변수의 이름(식별자)이 생략되었습니다.
+
+e. 유효하지 않음(Invalid): 구조체 멤버는 총 3개(invoiceNum, dailyPrice, daysRented)인데 초기값이 4개(<,15,0,0>)로 개수가 초과되었습니다.
