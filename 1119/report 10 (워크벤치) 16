@@ -1,0 +1,37 @@
+16번 문제
+번역: 다음과 같이 mLocate 매크로가 정의되어 있다고 가정하자.
+mLocate MACRO xval,yval
+    IF xval LT 0        ;; xval < 0?
+        EXITM           ;; if so, exit
+    ENDIF
+    IF yval LT 0        ;; yval < 0?
+        EXITM           ;; if so, exit
+    ENDIF
+    mov bx,0            ;; video page 0
+    mov ah,2            ;; locate cursor
+    mov dh,yval
+    mov dl,xval
+    int 10h             ;; call the BIOS
+ENDM
+
+.data
+row BYTE 15
+col BYTE 60
+.code
+mLocate -2,20
+mLocate 10,20
+mLocate col,row
+
+정답:
+1. mLocate -2,20
+xval이 -2이므로 IF -2 LT 0 조건이 참이 되어 EXITM을 만나 매크로 확장이 즉시 종료됩니다.
+생성되는 코드: 없음(빈 확장 / 아무 코드도 생성되지 않음).
+2. mLocate 10,20
+xval(10)과 yval(20) 모두 0 이상이므로 EXITM 없이 본문이 확장됩니다.
+mov bx,0
+mov ah,2
+mov dh,20
+mov dl,10
+int 10h
+3. mLocate col,row
+col과 row는 메모리 변수(BYTE)이므로 어셈블 타임 상수 비교(IF col LT 0)가 수행될 수 없어, 어셈블 타임 에러(상수 식 필요 / Constant expected)가 발생하거나 유효한 코드가 생성되지 않습니다. (참고: 만약 상수 조건 검사를 통과해 본문이 치환된다면 mov dh,row / mov dl,col 형태로 확장되지만, 실제 MASM 전처리기에서는 IF col LT 0 평가 단계에서 오류가 납니다.)
