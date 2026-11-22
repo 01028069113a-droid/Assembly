@@ -1,0 +1,11 @@
+13번 문제
+번역: IF, ELSE, ENDIF 지시어를 사용하는 짧은 예제를 작성하시오.
+
+정답: 어셈블 타임 상수 조건에 따라 조립될 코드를 선택하는 예시입니다.
+DEBUG_MODE = 1
+
+IF DEBUG_MODE EQ 1
+    mWrite "Debug mode is ON"
+ELSE
+    mWrite "Debug mode is OFF"
+ENDIF
