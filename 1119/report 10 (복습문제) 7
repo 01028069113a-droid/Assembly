@@ -1,0 +1,9 @@
+7번 문제
+번역: 상수 불리언 표현식(constant boolean expressions)에서 사용할 수 있는 관계 연산자(relational operators)를 모두 나열하시오.
+
+EQ : 같다
+NE: 같지않다
+LT: 작다
+LE: 작거나 같다
+GT: 크다
+GE: 크거나 같다
