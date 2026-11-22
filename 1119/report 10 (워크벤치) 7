@@ -1,0 +1,26 @@
+7번 문제
+번역: 프롬프트를 출력하고 사용자로부터 정수를 입력받는 mPromptInteger라는 매크로를 작성하시오. 문자열 리터럴과 더블워드(DWORD) 
+변수의 이름을 인자로 전달한다. 호출 예시는 다음과 같다.
+
+.data
+minVal DWORD ?
+.code
+mPromptInteger "Enter the minimum value", minVal
+
+정답: 
+Irvine32의 WriteString과 ReadInt(정수를 EAX로 입력받음)를 활용하는 전형적인 형태입니다. 
+(mWrite 매크로가 있는 환경이라면 mWrite prompt로 대체할 수도 있습니다.)
+mPromptInteger MACRO prompt, varName
+    LOCAL strPrompt
+    .data
+    strPrompt BYTE prompt, 0
+    .code
+    push edx
+    push eax
+    mov edx, OFFSET strPrompt
+    call WriteString
+    call ReadInt
+    mov varName, eax
+    pop eax
+    pop edx
+ENDM
