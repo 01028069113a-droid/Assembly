@@ -1,0 +1,14 @@
+15번 문제
+번역: 매크로 매개변수가 문자열 리터럴(literal string) 안에 포함된 상황에서 & 연산자의 사용법을 보여주는 짧은 매크로를 작성하시오.
+
+정답: 큰따옴표("...")로 감싸인 리터럴 문자열 내부에서는 매개변수 이름이 자동으로 치환되지 않으므로, &매개변수명& 형태로 감싸서 실제 인자 문자열이 리터럴 안에 치환되도록 합니다.
+mShowLabel MACRO lblName
+    mWrite "Current label is &lblName&"
+    call Crlf
+ENDM
+
+; 호출 예시: "Current label is LOOP_START" 출력
+mShowLabel LOOP_START
+
+
+ENDIF
