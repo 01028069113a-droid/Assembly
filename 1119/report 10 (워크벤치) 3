@@ -1,0 +1,11 @@
+3번 문제
+번역: 다음 Triangle 구조체를 사용하여 구조체 변수를 선언하고, 각 꼭짓점(vertices)을 (0,0), (5, 0), (7,6)으로 초기화하시오.
+
+Triangle STRUCT
+    Vertex1 COORD <>
+    Vertex2 COORD <>
+    Vertex3 COORD <>
+Triangle ENDS
+
+정답: Irvine32/MASM에서 COORD 구조체는 X와 Y 두 개의 16비트 정수 필드로 구성되므로, 중첩된 꺾쇠괄호 <x, y>를 사용해 각 꼭짓점을 초기화합니다.
+tri1 Triangle < <0,0>, <5,0>, <7,6> >
