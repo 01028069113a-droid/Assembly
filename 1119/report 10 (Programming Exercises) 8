@@ -1,0 +1,64 @@
+8번문제
+
+번역: DrunkardWalk 프로그램을 테스트할 때, 교수가 시작점에서 멀리 벗어나지 않는다는 것을 눈치챘을 것이다. 
+이는 어떤 방향으로든 동일한 확률로 이동하기 때문이다. 이전 걸음과 같은 방향으로 계속 걸을 확률이 50%, 반대 방향으로 뒤집을 확률이 10%, 
+오른쪽 또는 왼쪽으로 방향을 틀 확률이 각각 20%가 되도록 프로그램을 수정하시오. 루프가 시작되기 전에 기본 시작 방향을 할당하시오.
+
+정답: 0 ~ 99 범위의 난수를 뽑아 누적 확률 구간으로 분기합니다.
+0 ~ 49 (50%): 현재 방향 유지(+0)
+
+50 ~ 59 (10%): 반대 방향(+2 mod 4)
+
+60 ~ 79 (20%): 왼쪽 회전(+3 mod 4, 즉 -1 mod 4)
+
+80 ~ 99 (20%): 오른쪽 회전(+1 mod 4)
+(방향 인코딩 예: 0 = 북쪽 (0, -1), 1 = 동쪽 (+1, 0), 2 = 남쪽 (0, +1), 3 = 서쪽 (-1, 0))
+INCLUDE Irvine32.inc
+
+STEPS = 50
+
+.data
+dir DWORD 0             ; 0: 북, 1: 동, 2: 남, 3: 서
+
+.code
+main PROC
+    call Randomize
+    mov dir, 0              ; 기본 시작 방향: 북쪽
+    mov ecx, STEPS
+
+L1:
+    mov eax, 100
+    call RandomRange        ; 0 ~ 99
+
+    cmp eax, 50
+    jb KeepDir              ; 0..49 (50%) -> 유지
+
+    cmp eax, 60
+    jb ReverseDir           ; 50..59 (10%) -> 반대 (+2)
+
+    cmp eax, 80
+    jb TurnLeft             ; 60..79 (20%) -> 좌회전 (+3)
+
+    ; 80..99 (20%) -> 우회전 (+1)
+    inc dir
+    and dir, 3
+    jmp ApplyMove
+
+ReverseDir:
+    add dir, 2
+    and dir, 3
+    jmp ApplyMove
+
+TurnLeft:
+    add dir, 3
+    and dir, 3
+    jmp ApplyMove
+
+KeepDir:
+ApplyMove:
+    ; dir 값(0..3)에 따라 좌표 갱신 및 출력 로직 연결
+    loop L1
+
+    exit
+main ENDP
+END main
