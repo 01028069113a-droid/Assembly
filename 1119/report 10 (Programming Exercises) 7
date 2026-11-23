@@ -1,0 +1,85 @@
+7번문제
+
+번역: 10.1.6절에서 교수가 캠퍼스를 술 취한 듯 걷는(drunkard's walk) 동안 경로 어딘가에서 휴대폰을 잃어버렸다는 사실을 알게 되었다. 
+술 취한 걸음을 시뮬레이션할 때, 프로그램은 임의의 시간 간격(스텝)에서 교수가 서 있는 위치에 휴대폰을 떨어뜨려야 한다. 프로그램을 실행할 때마다 
+매번 다른 시간 간격(및 위치)에서 휴대폰을 잃어버리게 된다.
+
+정답: 전체 걸음 횟수(예: MAX_STEPS = 25) 중 1 이상 MAX_STEPS 이하의 난수 스텝(dropStep)을 미리 뽑아 두고, 루프를 돌며 현재 스텝이 dropStep과 
+일치할 때 현재 좌표 (X, Y)를 휴대폰 분실 위치로 기록/출력하는 방식입니다.
+
+INCLUDE Irvine32.inc
+
+WALK_MAX = 25
+
+.data
+dropStep DWORD ?
+dropX    WORD ?
+dropY    WORD ?
+msgDrop  BYTE "Phone lost at step ", 0
+msgAt    BYTE " -> X: ", 0
+msgY     BYTE ", Y: ", 0
+
+.code
+main PROC
+    call Randomize
+    mov eax, WALK_MAX
+    call RandomRange
+    inc eax                 ; 1 ~ WALK_MAX 사이 스텝 선택
+    mov dropStep, eax
+
+    mov ecx, WALK_MAX
+    mov ebx, 1              ; 현재 스텝 카운터
+    ; 초기 위치 설정 예시
+    mov dx, 10              ; X
+    mov bp, 10              ; Y
+
+WalkLoop:
+    ; 임의 방향 이동 예시 (0: 북, 1: 남, 2: 동, 3: 서)
+    mov eax, 4
+    call RandomRange
+    cmp eax, 0
+    je MoveNorth
+    cmp eax, 1
+    je MoveSouth
+    cmp eax, 2
+    je MoveEast
+    dec dx
+    jmp CheckDrop
+MoveNorth:
+    dec bp
+    jmp CheckDrop
+MoveSouth:
+    inc bp
+    jmp CheckDrop
+MoveEast:
+    inc dx
+
+CheckDrop:
+    cmp ebx, dropStep
+    jne NextStep
+    mov dropX, dx
+    mov dropY, bp
+
+NextStep:
+    inc ebx
+    loop WalkLoop
+
+    mov edx, OFFSET msgDrop
+    call WriteString
+    mov eax, dropStep
+    call WriteDec
+
+    mov edx, OFFSET msgAt
+    call WriteString
+    movsx eax, dropX
+    call WriteInt
+
+    mov edx, OFFSET msgY
+    call WriteString
+    movsx eax, dropY
+    call WriteInt
+    call Crlf
+
+    exit
+main ENDP
+END main
