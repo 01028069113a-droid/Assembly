@@ -1,0 +1,29 @@
+3번문제
+
+번역: 두 개의 32비트 메모리 피연산자를 받아 소스 값을 목적지 값으로 복사하는 mMove32 매크로와 테스트 프로그램을 작성하시오.
+
+정답:
+INCLUDE Irvine32.inc
+
+mMove32 MACRO src, dst
+    push eax
+    mov eax, src
+    mov dst, eax
+    pop eax
+ENDM
+
+.data
+sourceVal DWORD 12345678h
+destVal   DWORD 0
+
+.code
+main PROC
+    mMove32 sourceVal, destVal
+
+    mov eax, destVal
+    call WriteHex
+    call Crlf
+
+    exit
+main ENDP
+END main
