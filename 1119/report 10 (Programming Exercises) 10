@@ -1,0 +1,120 @@
+10번문제
+
+문제 번역
+일부 컴퓨터 명령어 집합은 세 개의 피연산자를 갖는 산술 명령어를 허용한다. 이러한 연산은 학생들에게 어셈블리어를 소개하거나 컴파일러에서 
+중간 언어(intermediate language)를 사용할 때 쓰이는 간단한 가상 어셈블러에 종종 등장한다.
+다음 매크로들에서는 EAX가 매크로 연산용으로 예약되어 보존되지 않는다고 가정한다. 매크로가 수정하는 다른 레지스터는 반드시 보존해야 한다. 
+모든 매개변수는 부호 있는 메모리 더블워드(signed memory doublewords, SDWORD)이다. 다음 연산들을 시뮬레이션하는 매크로를 작성하시오:
+
+
+.data
+temp DWORD ?
+.code
+add3 temp, w, y        ; temp = w + y
+mul3 x, temp, z        ; x = temp * z
+
+
+정답:
+
+INCLUDE Irvine32.inc
+
+; a. destination = source1 + source2
+add3 MACRO destination, source1, source2
+    mov eax, source1
+    add eax, source2
+    mov destination, eax
+ENDM
+
+; b. destination = source1 - source2
+sub3 MACRO destination, source1, source2
+    mov eax, source1
+    sub eax, source2
+    mov destination, eax
+ENDM
+
+; c. destination = source1 * source2 (부호 있는 32비트 곱)
+mul3 MACRO destination, source1, source2
+    push edx
+    mov eax, source1
+    imul source2
+    mov destination, eax
+    pop edx
+ENDM
+
+; d. destination = source1 / source2 (부호 있는 32비트 나눗셈, 몫 저장)
+div3 MACRO destination, source1, source2
+    push edx
+    mov eax, source1
+    cdq
+    idiv source2
+    mov destination, eax
+    pop edx
+ENDM
+
+.data
+w SDWORD 10
+y SDWORD 5
+z SDWORD 3
+k SDWORD 2
+m SDWORD 4
+
+temp1 SDWORD ?
+temp2 SDWORD ?
+
+; 4개 산술 식 결과 저장 변수
+res1  SDWORD ?         ; (w + y) * z = (10 + 5) * 3 = 45
+res2  SDWORD ?         ; (w * z) - y = (10 * 3) - 5 = 25
+res3  SDWORD ?         ; (w + y) / z = (10 + 5) / 3 = 5
+res4  SDWORD ?         ; (z * m - y) / k = (3 * 4 - 5) / 2 = 3
+
+msg1  BYTE "Expr 1 ((w + y) * z) = ", 0
+msg2  BYTE "Expr 2 ((w * z) - y) = ", 0
+msg3  BYTE "Expr 3 ((w + y) / z) = ", 0
+msg4  BYTE "Expr 4 ((z * m - y) / k) = ", 0
+
+.code
+main PROC
+    ; 식 1: res1 = (w + y) * z
+    add3 temp1, w, y
+    mul3 res1, temp1, z
+
+    mov edx, OFFSET msg1
+    call WriteString
+    mov eax, res1
+    call WriteInt
+    call Crlf
+
+    ; 식 2: res2 = (w * z) - y
+    mul3 temp1, w, z
+    sub3 res2, temp1, y
+
+    mov edx, OFFSET msg2
+    call WriteString
+    mov eax, res2
+    call WriteInt
+    call Crlf
+
+    ; 식 3: res3 = (w + y) / z
+    add3 temp1, w, y
+    div3 res3, temp1, z
+
+    mov edx, OFFSET msg3
+    call WriteString
+    mov eax, res3
+    call WriteInt
+    call Crlf
+
+    ; 식 4: res4 = (z * m - y) / k
+    mul3 temp1, z, m
+    sub3 temp2, temp1, y
+    div3 res4, temp2, k
+
+    mov edx, OFFSET msg4
+    call WriteString
+    mov eax, res4
+    call WriteInt
+    call Crlf
+
+    exit
+main ENDP
+END main
