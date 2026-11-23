@@ -1,0 +1,42 @@
+5번문제
+번역: 표준 입력에서 16비트 또는 32비트 부호 있는 정수를 읽어 인자에 반환하는 mReadInt 매크로를 만드시오. 
+원하는 결과의 크기에 매크로가 적응할 수 있도록 조건부 연산자(TYPE 등)를 사용하시오. 다양한 크기의 피연산자를 전달하여 매크로를 테스트하는 프로그램을 
+작성하시오.
+
+정답: Irvine32의 ReadInt는 32비트 부호 있는 정수를 EAX로 읽어옵니다. 
+대상 피연산자의 TYPE이 2(16비트 SWORD/WORD)이면 AX에, 4(32비트 SDWORD/DWORD)이면 EAX에 저장합니다.
+
+INCLUDE Irvine32.inc
+
+mReadInt MACRO dst
+    push eax
+    call ReadInt
+    IF TYPE dst EQ 2
+        mov dst, ax
+    ELSEIF TYPE dst EQ 4
+        mov dst, eax
+    ELSE
+        ECHO Warning: mReadInt supports only 16-bit or 32-bit operands.
+    ENDIF
+    pop eax
+ENDM
+
+.data
+int16 SWORD ?
+int32 SDWORD ?
+
+.code
+main PROC
+    mReadInt int16
+    movsx eax, int16
+    call WriteInt
+    call Crlf
+
+    mReadInt int32
+    mov eax, int32
+    call WriteInt
+    call Crlf
+
+    exit
+main ENDP
+END main
