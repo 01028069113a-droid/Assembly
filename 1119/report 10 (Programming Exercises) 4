@@ -1,0 +1,33 @@
+4번문제
+
+번역: 두 개의 32비트 메모리 피연산자를 곱하여 32비트 곱(product)을 만드는 mMult32 매크로를 만드시오. 매크로를 테스트하는 프로그램을 작성하시오.
+
+정답: 부호 있는(imul) 또는 부호 없는(mul) 곱셈 중 32비트 결과를 얻는 기본 형태입니다. 아래 코드는 IMUL로 32비트 곱을 구해 dst에 저장합니다
+INCLUDE Irvine32.inc
+
+mMult32 MACRO op1, op2, dst
+    push eax
+    push edx
+    mov eax, op1
+    imul op2
+    mov dst, eax
+    pop edx
+    pop eax
+ENDM
+
+.data
+val1 DWORD 12
+val2 DWORD -5
+prod DWORD ?
+
+.code
+main PROC
+    mMult32 val1, val2, prod
+
+    mov eax, prod
+    call WriteInt
+    call Crlf
+
+    exit
+main ENDP
+END main
