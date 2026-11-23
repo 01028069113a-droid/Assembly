@@ -1,0 +1,38 @@
+6번문제
+번역: WriteInt 라이브러리 프로시저를 호출하여 부호 있는 정수를 표준 출력에 쓰는 mWriteInt 매크로를 만드시오. 매크로에 전달되는 인자는 바이트(BYTE/SBYTE), 워드(WORD/SWORD), 또는 더블워드(DWORD/SDWORD)일 수 있다. 인자의 크기에 맞춰 동작하도록 매크로 안에 조건부 연산자를 사용하시오. 서로 다른 크기의 인자를 전달해 테스트하는 프로그램을 작성하시오.
+
+정답: WriteInt는 EAX의 32비트 부호 있는 정수를 출력하므로, TYPE이 1이면 movsx eax, src, 2이면 movsx eax, src, 4이면 mov eax, src로 확장합니다.
+INCLUDE Irvine32.inc
+
+mWriteInt MACRO src
+    push eax
+    IF TYPE src EQ 1
+        movsx eax, src
+    ELSEIF TYPE src EQ 2
+        movsx eax, src
+    ELSEIF TYPE src EQ 4
+        mov eax, src
+    ELSE
+        ECHO Warning: mWriteInt supports BYTE, WORD, or DWORD operands.
+    ENDIF
+    call WriteInt
+    pop eax
+ENDM
+
+.data
+bVal SBYTE -15
+wVal SWORD -1234
+dVal SDWORD -123456
+
+.code
+main PROC
+    mWriteInt bVal
+    call Crlf
+    mWriteInt wVal
+    call Crlf
+    mWriteInt dVal
+    call Crlf
+
+    exit
+main ENDP
+END main
